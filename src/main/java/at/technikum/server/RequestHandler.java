@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RequestHandler {
 
@@ -28,11 +30,18 @@ public class RequestHandler {
 
     public void handle() throws IOException {
         in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+        Response response = null;
+        try {
+            String httpRequest = getHttpStringFromStream(in);
+            Request request = HttpMapper.toRequestObject(httpRequest);
+            response = app.handle(request);
+        } catch (RuntimeException runtimeException){
+            response = new Response();
+            response.setStatus(HttpStatus.BAD_REQUEST);
+            response.setContentType(HttpContentType.TEXT_PLAIN);
+            response.setBody("Error");
+        }
 
-        String httpRequest = getHttpStringFromStream(in);
-
-        Request request = HttpMapper.toRequestObject(httpRequest);
-        Response response = app.handle(request);
 
         out = new PrintWriter(client.getOutputStream(), true);
         out.write(HttpMapper.toResponseString(response));
@@ -42,6 +51,7 @@ public class RequestHandler {
         client.close();
     }
 
+    // THOUGHT: create a SocketReader class
     private String getHttpStringFromStream(BufferedReader in) throws IOException {
         StringBuilder builder = new StringBuilder();
 
@@ -51,6 +61,22 @@ public class RequestHandler {
                     .append(inputLine)
                     .append(System.lineSeparator());
         }
+
+        String httpRequest = builder.toString();
+
+        Pattern regex = Pattern.compile("^Content-Length:\\s(.+)", Pattern.MULTILINE);
+        Matcher matcher = regex.matcher(httpRequest);
+
+        if (!matcher.find()) {
+            return builder.toString();
+        }
+
+        builder.append(System.lineSeparator());
+
+        int contentLength = Integer.parseInt(matcher.group(1));
+        char[] buffer = new char[contentLength];
+        in.read(buffer, 0, contentLength);
+        builder.append(buffer);
 
         return builder.toString();
     }

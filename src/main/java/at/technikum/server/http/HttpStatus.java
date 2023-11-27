@@ -4,7 +4,8 @@ package at.technikum.server.http;
 public enum HttpStatus {
     OK(200, "OK"),
     BAD_REQUEST(400, "Bad Request"),
-    NOT_FOUND(404, "Not Found");
+    NOT_FOUND(404, "Not Found"),
+    CREATED(201, "Created");
 
     private final int code;
     private final String message;

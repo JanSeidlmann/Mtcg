@@ -1,30 +1,23 @@
 package at.technikum.apps.mtcg.repository;
 
 import at.technikum.apps.mtcg.entity.Card;
-import java.util.ArrayList;
+import at.technikum.apps.mtcg.entity.User;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public class Repository implements CardRepository {
+public interface Repository {
 
-    private final List<Card> cardList;
+    List<Card> findAllCards();
 
-    public Repository() { this.cardList = new ArrayList<>(); }
+    List<User> findAllUsers();
 
-    @Override
-    public Card save(Card card){
-        card.setId(cardList.size() + 1);
-        cardList.add(card);
-        return card;
-    }
+    Optional<Card> findCard(int id);
 
-    @Override
-    public List<Card> findAll() {
-        return cardList;
-    }
+    Optional<User> findUser(UUID id);
 
-    @Override
-    public Optional<Card> find(int id) {
-        return Optional.empty();
-    }
+    Card save(Card card);
+
+    User saveUser(User user);
 }

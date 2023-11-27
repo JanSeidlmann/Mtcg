@@ -2,7 +2,7 @@ package at.technikum.apps.mtcg.entity;
 
 public class Card {
 
-    private  int id;
+    private  String id;
 
     private String name;
 
@@ -14,5 +14,5 @@ public class Card {
 
     private int damage;
 
-    public void setId(int id) { this.id = id; }
+    public void setId(String id) { this.id = id; }
 }

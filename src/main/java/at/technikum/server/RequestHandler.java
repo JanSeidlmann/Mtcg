@@ -30,7 +30,7 @@ public class RequestHandler {
 
     public void handle() throws IOException {
         in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-        Response response = null;
+        Response response;
         try {
             String httpRequest = getHttpStringFromStream(in);
             Request request = HttpMapper.toRequestObject(httpRequest);
@@ -39,7 +39,7 @@ public class RequestHandler {
             response = new Response();
             response.setStatus(HttpStatus.BAD_REQUEST);
             response.setContentType(HttpContentType.TEXT_PLAIN);
-            response.setBody("Error");
+            response.setBody("Errorr");
         }
 
 

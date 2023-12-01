@@ -20,4 +20,6 @@ public interface Repository {
     Card save(Card card);
 
     User saveUser(User user);
+
+    Optional<User> findUserByUsername(String username);
 }

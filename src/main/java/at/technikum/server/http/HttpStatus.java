@@ -5,7 +5,8 @@ public enum HttpStatus {
     OK(200, "OK"),
     BAD_REQUEST(400, "Bad Request"),
     NOT_FOUND(404, "Not Found"),
-    CREATED(201, "Created");
+    CREATED(201, "Created"),
+    CONFLICT(409, "Conflict");
 
     private final int code;
     private final String message;

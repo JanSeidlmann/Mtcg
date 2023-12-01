@@ -72,4 +72,11 @@ public class MemoryRepository implements Repository {
     public Optional<User> findUser(UUID id) {
         return Optional.empty();
     }
+
+    @Override
+    public Optional<User> findUserByUsername(String username) {
+        return userList.stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
 }

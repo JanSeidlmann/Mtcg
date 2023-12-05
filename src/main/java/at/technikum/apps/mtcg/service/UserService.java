@@ -15,8 +15,6 @@ public class UserService {
 
     public UserService() { this.repository = new MemoryRepository(); }
 
-    public List<User> findAllUsers() { return repository.findAllUsers(); }
-
     public Optional<User> findUser(int id) { return Optional.empty(); }
 
     public Optional<User> findUserByUsername(String username) {

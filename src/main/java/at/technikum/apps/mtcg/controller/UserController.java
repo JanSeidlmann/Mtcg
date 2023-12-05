@@ -10,7 +10,7 @@ import at.technikum.server.http.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import java.util.List;
+import java.util.Optional;
 
 public class UserController implements Controller {
 
@@ -37,36 +37,56 @@ public class UserController implements Controller {
 
     @Override
     public Response handle(Request request) {
+        String[] routeParts = request.getRoute().split("/");
 
         if (request.getRoute().equals("/users")) {
             switch (request.getMethod()) {
-                case "GET":
-                    return findAllUsers(request);
                 case "POST":
                     return createUser(request);
+                default: return status(HttpStatus.BAD_REQUEST); //Besser 405
+            }
+        } else if ( routeParts.length == 3) {
+            String username = routeParts[2];
+
+            switch (request.getMethod()) {
+                case "GET":
+                    return findUserByUsername(username, request);
+                // case "PUT":
+                //    return updateUser(request);
                 default: return status(HttpStatus.BAD_REQUEST); //Besser 405
             }
         }
         return status(HttpStatus.BAD_REQUEST);
     }
 
-    private Response findAllUsers(Request request) {
-        List<User> tasks = userService.findAllUsers();
+    private Response findUserByUsername(String username, Request request) {
+        // Überprüfe, ob der Benutzer existiert
+        Optional<User> userOptional = userService.findUserByUsername(username);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String tasksJson = null;
-        try {
-            tasksJson = objectMapper.writeValueAsString(tasks);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        if (userOptional.isPresent()) {
+            // Der Benutzer wurde gefunden
+            User user = userOptional.get();
+
+            // Konvertiere den gefundenen Benutzer in JSON
+            String userJson;
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                userJson = objectMapper.writeValueAsString(user);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Error processing JSON", e);
+            }
+
+            // Baue die Response mit dem gefundenen Benutzer
+            Response response = new Response();
+            response.setStatus(HttpStatus.OK);
+            response.setContentType(HttpContentType.APPLICATION_JSON);
+            response.setBody(userJson);
+
+            return response;
+        } else {
+            // Der Benutzer wurde nicht gefunden
+            return status(HttpStatus.NOT_FOUND); // Oder eine andere geeignete Statusmeldung
         }
-
-        Response response = new Response();
-        response.setStatus(HttpStatus.CREATED);
-        response.setContentType(HttpContentType.APPLICATION_JSON);
-        response.setBody(tasksJson);
-
-        return response;
     }
 
     private Response createUser(Request request){

@@ -11,8 +11,6 @@ public interface Repository {
 
     List<Card> findAllCards();
 
-    List<User> findAllUsers();
-
     Optional<Card> findCard(int id);
 
     Optional<User> findUser(UUID id);

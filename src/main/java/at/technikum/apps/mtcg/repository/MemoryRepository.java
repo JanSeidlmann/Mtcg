@@ -5,6 +5,7 @@ import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.entity.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,8 @@ public class MemoryRepository implements Repository {
     private final List<User> userList;
 
     private final String SAVE_SQL = "INSERT INTO users(id, username, password) VALUES(?, ?, ?)";
+
+    private final String FIND_ALL_SQL = "SELECT * FROM users";
 
     private final Database database = new Database();
 
@@ -61,11 +64,6 @@ public class MemoryRepository implements Repository {
         }
 
         return user;
-    }
-
-    @Override
-    public List<User> findAllUsers() {
-        return userList;
     }
 
     @Override

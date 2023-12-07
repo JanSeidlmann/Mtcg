@@ -51,8 +51,8 @@ public class UserController implements Controller {
             switch (request.getMethod()) {
                 case "GET":
                     return findUserByUsername(username, request);
-                // case "PUT":
-                //    return updateUser(request);
+                case "PUT":
+                    return updateUserByUsername(username, request);
                 default: return status(HttpStatus.BAD_REQUEST); //Besser 405
             }
         }
@@ -60,14 +60,11 @@ public class UserController implements Controller {
     }
 
     private Response findUserByUsername(String username, Request request) {
-        // Überprüfe, ob der Benutzer existiert
         Optional<User> userOptional = userService.findUserByUsername(username);
 
         if (userOptional.isPresent()) {
-            // Der Benutzer wurde gefunden
             User user = userOptional.get();
 
-            // Konvertiere den gefundenen Benutzer in JSON
             String userJson;
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -76,7 +73,6 @@ public class UserController implements Controller {
                 throw new RuntimeException("Error processing JSON", e);
             }
 
-            // Baue die Response mit dem gefundenen Benutzer
             Response response = new Response();
             response.setStatus(HttpStatus.OK);
             response.setContentType(HttpContentType.APPLICATION_JSON);
@@ -84,8 +80,7 @@ public class UserController implements Controller {
 
             return response;
         } else {
-            // Der Benutzer wurde nicht gefunden
-            return status(HttpStatus.NOT_FOUND); // Oder eine andere geeignete Statusmeldung
+            return status(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -116,8 +111,40 @@ public class UserController implements Controller {
 
                 return response;
             } catch (DuplicateUserException e) {
-                // Benutzer mit gleichem Benutzernamen existiert bereits
                 return status(HttpStatus.CONFLICT); // 409 Conflict status code
             }
         }
+
+    private Response updateUserByUsername(String username, Request request) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        User updatedUser;
+
+        try {
+            updatedUser = objectMapper.readValue(request.getBody(), User.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            Optional<User> existingUserOptional = userService.updateUserByUsername(username, updatedUser);
+
+            if (existingUserOptional.isPresent()) {
+                // Der Benutzer wurde gefunden
+                User existingUser = existingUserOptional.get();
+                String updatedUserJson = objectMapper.writeValueAsString(existingUser);
+
+                Response response = new Response();
+                response.setStatus(HttpStatus.OK);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody(updatedUserJson);
+
+                return response;
+            } else {
+                return status(HttpStatus.BAD_REQUEST);
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

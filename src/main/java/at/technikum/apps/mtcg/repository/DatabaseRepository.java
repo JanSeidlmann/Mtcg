@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +19,7 @@ public class DatabaseRepository implements Repository {
     private final String FIND_ALL_SQL = "SELECT * FROM users";
     private final String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
     private final String SAVE_SQL = "INSERT INTO users(id, username, password) VALUES(?, ?, ?)";
+
     private final Database database = new Database();
     public DatabaseRepository(List<Card> cardList, List<User> userList) {
         this.cardList = cardList;
@@ -46,12 +46,11 @@ public class DatabaseRepository implements Repository {
     @Override
     public Optional<User> findUserByUsername(String username) {
         try (
-            Connection con = database.getConnection();
-            PreparedStatement preparedStatement = con.prepareStatement(FIND_USER_BY_USERNAME);
-            ResultSet rs = preparedStatement.executeQuery("SELECT * FROM users WHERE username = ?");
+                Connection con = database.getConnection();
+                PreparedStatement preparedStatement = con.prepareStatement(FIND_USER_BY_USERNAME)
         ) {
             preparedStatement.setString(1, username);
-
+            try (ResultSet rs = preparedStatement.executeQuery()) {
                 if (rs.next()) {
                     String id = rs.getString("id");
                     String password = rs.getString("password");
@@ -63,12 +62,40 @@ public class DatabaseRepository implements Repository {
 
                     return Optional.of(user);
                 }
-            } catch (SQLException e) {
-                e.printStackTrace(); // Fehlt noch
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         return Optional.empty();
     }
+
+    @Override
+    public Optional<User> updateUserByUsername(String username, User user) {
+        try (
+                Connection con = database.getConnection();
+                PreparedStatement preparedStatement = con.prepareStatement(FIND_USER_BY_USERNAME)
+        ) {
+            preparedStatement.setString(1, username);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    String id = rs.getString("id");
+
+                    user.setId(id);
+                    user.setUsername(username); // You don't need to set the username and password again
+                    saveUser(user);
+
+                    return Optional.of(user);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return Optional.empty();
+    }
+
 
     @Override
     public List<Card> findAllCards() {

@@ -20,4 +20,6 @@ public interface Repository {
     User saveUser(User user);
 
     Optional<User> findUserByUsername(String username);
+
+    Optional<User> updateUserByUsername(String username, User user);
 }

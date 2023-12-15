@@ -2,6 +2,8 @@ package at.technikum.apps.mtcg.controller;
 
 import at.technikum.apps.mtcg.Exception.DuplicateUserException;
 import at.technikum.apps.mtcg.entity.User;
+import at.technikum.apps.mtcg.repository.DatabaseRepository;
+import at.technikum.apps.mtcg.repository.Repository;
 import at.technikum.apps.mtcg.service.UserService;
 import at.technikum.server.http.HttpContentType;
 import at.technikum.server.http.HttpStatus;
@@ -15,9 +17,11 @@ import java.util.Optional;
 public class UserController implements Controller {
 
     private final UserService userService;
+    private final Repository repository;
 
     public UserController() {
         this.userService = new UserService();
+        this.repository = new DatabaseRepository();
     }
 
     @Override
@@ -118,20 +122,21 @@ public class UserController implements Controller {
     private Response updateUserByUsername(String username, Request request) {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        User updatedUser;
+        User updatedUser = null;
 
         try {
             updatedUser = objectMapper.readValue(request.getBody(), User.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
         try {
-            Optional<User> existingUserOptional = userService.updateUserByUsername(username, updatedUser);
+            Optional<User> existingUserOptional = userService.findUserByUsername(username);
 
             if (existingUserOptional.isPresent()) {
-                // Der Benutzer wurde gefunden
                 User existingUser = existingUserOptional.get();
+                existingUser.setUsername(updatedUser.getUsername());
+                existingUser.setPassword(updatedUser.getPassword());
+                userService.updateUserByUsername(username, request);
                 String updatedUserJson = objectMapper.writeValueAsString(existingUser);
 
                 Response response = new Response();

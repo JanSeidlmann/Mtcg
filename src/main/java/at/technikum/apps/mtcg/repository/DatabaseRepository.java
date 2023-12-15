@@ -3,6 +3,9 @@ package at.technikum.apps.mtcg.repository;
 import at.technikum.apps.mtcg.database.Database;
 import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.entity.User;
+import at.technikum.server.http.Request;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,18 +16,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class DatabaseRepository implements Repository {
-
-    private final List<Card> cardList;
-    private final List<User> userList;
-    private final String FIND_ALL_SQL = "SELECT * FROM users";
     private final String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
+    private final String UPDATE_USER_BY_USERNAME = "UPDATE users SET password = ?, username = ? WHERE username = ?";
     private final String SAVE_SQL = "INSERT INTO users(id, username, password) VALUES(?, ?, ?)";
-
     private final Database database = new Database();
-    public DatabaseRepository(List<Card> cardList, List<User> userList) {
-        this.cardList = cardList;
-        this.userList = userList;
-    }
 
     @Override
     public User saveUser(User user) {
@@ -71,25 +66,26 @@ public class DatabaseRepository implements Repository {
     }
 
     @Override
-    public Optional<User> updateUserByUsername(String username, User user) {
+    public Optional<User> updateUserByUsername(String username, Request request) {
+        ObjectMapper objectMapper = new ObjectMapper();
         try (
                 Connection con = database.getConnection();
-                PreparedStatement preparedStatement = con.prepareStatement(FIND_USER_BY_USERNAME)
+                PreparedStatement preparedStatement = con.prepareStatement(UPDATE_USER_BY_USERNAME)
         ) {
-            preparedStatement.setString(1, username);
+            String newPassword = objectMapper.readTree(request.getBody()).get("password").asText();
+            String newUsername = objectMapper.readTree(request.getBody()).get("username").asText();
 
-            try (ResultSet rs = preparedStatement.executeQuery()) {
-                if (rs.next()) {
-                    String id = rs.getString("id");
+            preparedStatement.setString(1, newPassword);
+            preparedStatement.setString(2, newUsername);
+            preparedStatement.setString(3, username);
 
-                    user.setId(id);
-                    user.setUsername(username); // You don't need to set the username and password again
-                    saveUser(user);
+            int rowsUpdated = preparedStatement.executeUpdate();
 
-                    return Optional.of(user);
-                }
+            if (rowsUpdated > 0) {
+                // If the update was successful, retrieve the updated user
+                return findUserByUsername(newUsername);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | JsonProcessingException e) {
             e.printStackTrace();
         }
 

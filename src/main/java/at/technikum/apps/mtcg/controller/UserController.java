@@ -9,6 +9,7 @@ import at.technikum.server.http.HttpContentType;
 import at.technikum.server.http.HttpStatus;
 import at.technikum.server.http.Request;
 import at.technikum.server.http.Response;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -26,7 +27,8 @@ public class UserController implements Controller {
 
     @Override
     public boolean supports(String route) {
-        return route.startsWith("/users");
+
+        return route.startsWith("/users") || route.equals("/sessions");
     }
 
     @Override
@@ -47,7 +49,13 @@ public class UserController implements Controller {
             switch (request.getMethod()) {
                 case "POST":
                     return createUser(request);
-                default: return status(HttpStatus.BAD_REQUEST); //Besser 405
+                default: return status(HttpStatus.BAD_REQUEST); // Besser 405
+            }
+        } else if (request.getRoute().equals("/sessions")) {
+            switch (request.getMethod()){
+                case "POST":
+                    return loginUser(request);
+                default: return status(HttpStatus.BAD_REQUEST); // Besser 405
             }
         } else if ( routeParts.length == 3) {
             String username = routeParts[2];
@@ -57,11 +65,12 @@ public class UserController implements Controller {
                     return findUserByUsername(username, request);
                 case "PUT":
                     return updateUserByUsername(username, request);
-                default: return status(HttpStatus.BAD_REQUEST); //Besser 405
+                default: return status(HttpStatus.BAD_REQUEST); // Besser 405
             }
         }
         return status(HttpStatus.BAD_REQUEST);
     }
+
 
     private Response findUserByUsername(String username, Request request) {
         Optional<User> userOptional = userService.findUserByUsername(username);
@@ -147,6 +156,32 @@ public class UserController implements Controller {
                 return response;
             } else {
                 return status(HttpStatus.BAD_REQUEST);
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Response loginUser(Request request) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(request.getBody());
+            String username = jsonNode.get("username").asText();
+            String password = jsonNode.get("password").asText();
+
+            Optional<User> existingUserOptional = userService.login(username, password);
+
+            if (existingUserOptional.isPresent()) {
+                User existingUser = existingUserOptional.get();
+                String user = objectMapper.writeValueAsString(existingUser);
+                Response response = new Response();
+                response.setStatus(HttpStatus.OK);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody(user + "\nSuccessfully logged in!");
+
+                return response;
+            } else {
+                return status(HttpStatus.UNAUTHORIZED);
             }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

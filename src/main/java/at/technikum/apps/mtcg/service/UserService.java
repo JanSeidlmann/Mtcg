@@ -27,6 +27,21 @@ public class UserService {
         return repository.updateUserByUsername(username, request);
     }
 
+    public Optional<User> login(String username, String password) {
+        Optional<User> userOptional = findUserByUsername(username);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            // Check if the provided password matches the stored password
+            if (password.equals(user.getPassword())) {
+                return Optional.of(user);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+
     public User save(User user) {
 
         if (findUserByUsername(user.getUsername()).isPresent()) {

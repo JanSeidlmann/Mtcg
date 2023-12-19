@@ -12,8 +12,13 @@ import at.technikum.server.http.Response;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
+import java.util.Date;
 import java.util.Optional;
+
+import static javax.crypto.Cipher.SECRET_KEY;
 
 public class UserController implements Controller {
 
@@ -131,7 +136,7 @@ public class UserController implements Controller {
     private Response updateUserByUsername(String username, Request request) {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        User updatedUser = null;
+        User updatedUser;
 
         try {
             updatedUser = objectMapper.readValue(request.getBody(), User.class);
@@ -172,12 +177,10 @@ public class UserController implements Controller {
             Optional<User> existingUserOptional = userService.login(username, password);
 
             if (existingUserOptional.isPresent()) {
-                User existingUser = existingUserOptional.get();
-                String user = objectMapper.writeValueAsString(existingUser);
                 Response response = new Response();
                 response.setStatus(HttpStatus.OK);
                 response.setContentType(HttpContentType.APPLICATION_JSON);
-                response.setBody(user + "\nSuccessfully logged in!");
+                response.setBody("Successfully logged in!");
 
                 return response;
             } else {

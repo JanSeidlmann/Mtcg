@@ -1,9 +1,11 @@
 package at.technikum.apps.mtcg.repository;
 
 import at.technikum.apps.mtcg.entity.Card;
+import at.technikum.apps.mtcg.entity.Package;
 import at.technikum.apps.mtcg.entity.User;
 import at.technikum.server.http.Request;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,9 +18,9 @@ public interface Repository {
 
     Optional<User> findUser(UUID id);
 
-    Card save(Card card);
-
     User saveUser(User user);
+
+    Package savePackage(Package pack);
 
     Optional<User> findUserByUsername(String username);
 

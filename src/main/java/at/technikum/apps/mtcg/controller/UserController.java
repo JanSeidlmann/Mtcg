@@ -1,6 +1,7 @@
 package at.technikum.apps.mtcg.controller;
 
 import at.technikum.apps.mtcg.Exception.DuplicateUserException;
+import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.entity.User;
 import at.technikum.apps.mtcg.repository.DatabaseRepository;
 import at.technikum.apps.mtcg.repository.Repository;
@@ -23,17 +24,17 @@ import static javax.crypto.Cipher.SECRET_KEY;
 public class UserController implements Controller {
 
     private final UserService userService;
-    private final Repository repository;
+    private final PackageController packageController;
 
     public UserController() {
         this.userService = new UserService();
-        this.repository = new DatabaseRepository();
+        this.packageController = new PackageController();
     }
 
     @Override
     public boolean supports(String route) {
 
-        return route.startsWith("/users") || route.equals("/sessions");
+        return route.startsWith("/users") || route.equals("/sessions") || route.equals("/packages");
     }
 
     @Override
@@ -64,13 +65,17 @@ public class UserController implements Controller {
             }
         } else if ( routeParts.length == 3) {
             String username = routeParts[2];
-
             switch (request.getMethod()) {
                 case "GET":
                     return findUserByUsername(username, request);
                 case "PUT":
                     return updateUserByUsername(username, request);
                 default: return status(HttpStatus.BAD_REQUEST); // Besser 405
+            }
+        } else if (request.getRoute().equals("/packages")) {
+            switch (request.getMethod()){
+                case "POST":
+                    return packageController.createPackage(request);
             }
         }
         return status(HttpStatus.BAD_REQUEST);
@@ -170,7 +175,7 @@ public class UserController implements Controller {
     private Response loginUser(Request request) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            JsonNode jsonNode = objectMapper.readTree(request.getBody());
+            JsonNode jsonNode = objectMapper.readTree(request.getBody()); // Geht anders mit objectmapper damit gleich
             String username = jsonNode.get("username").asText();
             String password = jsonNode.get("password").asText();
 

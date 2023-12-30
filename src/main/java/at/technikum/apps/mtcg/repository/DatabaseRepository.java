@@ -2,6 +2,7 @@ package at.technikum.apps.mtcg.repository;
 
 import at.technikum.apps.mtcg.database.Database;
 import at.technikum.apps.mtcg.entity.Card;
+import at.technikum.apps.mtcg.entity.Package;
 import at.technikum.apps.mtcg.entity.User;
 import at.technikum.server.http.Request;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,8 +19,35 @@ import java.util.UUID;
 public class DatabaseRepository implements Repository {
     private final String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
     private final String UPDATE_USER_BY_USERNAME = "UPDATE users SET password = ?, username = ? WHERE username = ?";
-    private final String SAVE_SQL = "INSERT INTO users(id, username, password) VALUES(?, ?, ?)";
+    private final String SAVE_SQL = "INSERT INTO users(id, username, password, coins) VALUES(?, ?, ?, ?)";
+    private final String SAVE_PACKAGE_SQL = "INSERT INTO packages(id, name, damage, isSpell) VALUES(?, ?, ?, ?)";
     private final Database database = new Database();
+
+    @Override
+    public Package savePackage(Package pack) {
+        try(
+                Connection con = database.getConnection();
+                PreparedStatement pstmt = con.prepareStatement(SAVE_PACKAGE_SQL)
+        ) {
+            for (Card card : pack.getCards()) {
+                saveCard(card, pstmt);
+            }
+            pstmt.executeBatch();
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // THOUGHT: how do i handle exceptions (hint: look at the TaskApp)
+        }
+
+        return pack;
+    }
+
+    private void saveCard(Card card, PreparedStatement pstmt) throws SQLException {
+        pstmt.setString(1, UUID.randomUUID().toString());
+        pstmt.setString(2, card.getName());
+        pstmt.setInt(3, card.getDamage());
+        pstmt.setBoolean(4, card.isSpell());
+        pstmt.addBatch();
+    }
 
     @Override
     public User saveUser(User user) {
@@ -30,6 +58,7 @@ public class DatabaseRepository implements Repository {
             pstmt.setString(1, user.getId());
             pstmt.setString(2, user.getUsername());
             pstmt.setString(3, user.getPassword());
+            pstmt.setInt(4, user.getCoins());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace(); // THOUGHT: how do i handle exceptions (hint: look at the TaskApp)
@@ -49,11 +78,13 @@ public class DatabaseRepository implements Repository {
                 if (rs.next()) {
                     String id = rs.getString("id");
                     String password = rs.getString("password");
+                    int coins = rs.getInt("coins");
 
                     User user = new User();
                     user.setId(id);
                     user.setUsername(username);
                     user.setPassword(password);
+                    user.setCoins(coins);
 
                     return Optional.of(user);
                 }
@@ -109,8 +140,4 @@ public class DatabaseRepository implements Repository {
         return Optional.empty();
     }
 
-    @Override
-    public Card save(Card card) {
-        return null;
-    }
 }

@@ -10,6 +10,8 @@ public class User {
 
     public String password;
 
+    public int coins;
+
     public void setId(String id) { this.id = id; }
 
     public String getId() {
@@ -30,5 +32,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getCoins() {
+        return coins;
+    }
+
+    public void setCoins(int coins) {
+        this.coins = coins;
     }
 }

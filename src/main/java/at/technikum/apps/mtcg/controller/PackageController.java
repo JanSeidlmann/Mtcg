@@ -3,6 +3,7 @@ package at.technikum.apps.mtcg.controller;
 import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.entity.Package;
 import at.technikum.apps.mtcg.repository.DatabaseRepository;
+import at.technikum.apps.mtcg.repository.PackageRepository;
 import at.technikum.apps.mtcg.repository.Repository;
 import at.technikum.server.http.HttpContentType;
 import at.technikum.server.http.HttpStatus;
@@ -21,7 +22,7 @@ public class PackageController {
     private final Repository repository;
 
     public PackageController(){
-        this.repository = new DatabaseRepository();
+        this.repository = new PackageRepository();
     }
 
     public Response createPackage(Request request) {
@@ -30,12 +31,9 @@ public class PackageController {
         try {
             List<Card> cards = Arrays.asList(objectMapper.readValue(request.getBody(), Card[].class));
 
-            Package pack = new Package();
-            pack.addCards(cards);
+            repository.addCards(cards);
 
-            pack = repository.savePackage(pack);
-
-            String packJson = objectMapper.writeValueAsString(pack);
+            String packJson = objectMapper.writeValueAsString(cards);
 
             Response response = new Response();
             response.setStatus(HttpStatus.CREATED);

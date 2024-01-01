@@ -4,35 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Package {
-    private List<Card> cards;
-    private int cost;
+    private String package_id;
+    private Boolean bought;
 
-    public Package() {
-        this.cards = new ArrayList<>();
+    public String getPackage_id() {
+        return package_id;
     }
 
-    public void addCards(List<Card> newCards) {
-        for (Card newCard : newCards) {
-            if (cards.contains(newCard)) {
-                throw new IllegalArgumentException("Duplicate card found in the package.");
-            }
-        }
-        cards.addAll(newCards);
+    public void setPackage_id(String package_id) {
+        this.package_id = package_id;
     }
 
-    public List<Card> getCards() {
-        return cards;
+
+    public Boolean getBought() {
+        return bought;
     }
 
-    public void setCards(List<Card> cards) {
-        this.cards = cards;
-    }
-
-    public int getCost() {
-        return cost;
-    }
-
-    public void setCost(int cost) {
-        this.cost = cost;
+    public void setBought(Boolean bought) {
+        this.bought = bought;
     }
 }

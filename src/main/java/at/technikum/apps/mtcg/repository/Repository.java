@@ -20,7 +20,7 @@ public interface Repository {
 
     User saveUser(User user);
 
-    Package savePackage(Package pack);
+    void addCards(List<Card> newCards);
 
     Optional<User> findUserByUsername(String username);
 

@@ -6,9 +6,16 @@ CREATE TABLE IF NOT EXISTS users (
 
 );
 
-CREATE TABLE IF NOT EXISTS packages (
-                        id VARCHAR(255) PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS cards (
+                        package_id VARCHAR(255),
+                        card_id VARCHAR(255) PRIMARY KEY,
                         name VARCHAR(255),
                         damage INTEGER,
+                        type VARCHAR(255),
                         isSpell BOOLEAN
+);
+
+CREATE TABLE IF NOT EXISTS packages (
+                                package_id VARCHAR(255) PRIMARY KEY,
+                                bought BOOLEAN
 );

@@ -2,7 +2,6 @@ package at.technikum.apps.mtcg.repository;
 
 import at.technikum.apps.mtcg.database.Database;
 import at.technikum.apps.mtcg.entity.Card;
-import at.technikum.apps.mtcg.entity.Package;
 import at.technikum.apps.mtcg.entity.User;
 import at.technikum.server.http.Request;
 
@@ -15,8 +14,8 @@ import java.util.UUID;
 
 public class PackageRepository implements Repository {
 
-    private final String SAVE_PACKAGE_SQL = "INSERT INTO packages (package_id, bought) VALUES (?, ?)";
-    private final String SAVE_CARD_SQL = "INSERT INTO cards (package_id, card_id, name, damage, type, isSpell) VALUES (?, ?, ?, ?, ?, ?)";
+    private final String SAVE_PACKAGE_SQL = "INSERT INTO packages (card1, card2, card3, card4, card5) VALUES (?, ?, ? ,? ,?)";
+    private final String SAVE_CARD_SQL = "INSERT INTO cards (card_id, name, damage, type, isSpell) VALUES (?, ?, ?, ?, ?)";
     private final Database database = new Database();
 
     @Override
@@ -38,18 +37,17 @@ public class PackageRepository implements Repository {
             for (int i = 0; i < newCards.size(); i++){
                 Card card = newCards.get(i);
 
-                pstmt1.setInt(1, card.getPackage_id());
-                pstmt1.setString(2, card.getCard_id());
-                pstmt1.setString(3, card.getName());
-                pstmt1.setInt(4, card.getDamage());
-                pstmt1.setString(5, card.getType());
-                pstmt1.setBoolean(6, card.isSpell());
+                pstmt1.setString(1, card.getCard_id());
+                pstmt1.setString(2, card.getName());
+                pstmt1.setInt(3, card.getDamage());
+                pstmt1.setString(4, card.getType());
+                pstmt1.setBoolean(5, card.isSpell());
                 pstmt1.executeUpdate();
             }
 
-            Card c = newCards.get(1);
-            pstmt2.setInt(1, c.getPackage_id());
-            pstmt2.setBoolean(2, false);
+            for (int i = 0; i < newCards.size(); i++) {
+                pstmt2.setString(i + 1, newCards.get(i).getCard_id());
+            }
             pstmt2.executeUpdate();
 
         } catch (SQLException e) {

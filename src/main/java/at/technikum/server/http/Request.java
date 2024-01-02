@@ -19,6 +19,16 @@ public class Request {
     // none, "{ "name": "foo" }"
     private String body;
 
+    private HeaderMap headerMap =  new HeaderMap();
+
+    public HeaderMap getHeaderMap() {
+        return headerMap;
+    }
+
+    public void setHeaderMap(HeaderMap headerMap) {
+        this.headerMap = headerMap;
+    }
+
     public String getMethod() {
         return method;
     }

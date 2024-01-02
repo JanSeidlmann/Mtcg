@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS cards (
-                        package_id VARCHAR(255),
                         card_id VARCHAR(255) PRIMARY KEY,
                         name VARCHAR(255),
                         damage INTEGER,
@@ -16,6 +15,10 @@ CREATE TABLE IF NOT EXISTS cards (
 );
 
 CREATE TABLE IF NOT EXISTS packages (
-                                package_id VARCHAR(255) PRIMARY KEY,
-                                bought BOOLEAN
+                                package_id SERIAL PRIMARY KEY,
+                                card1 VARCHAR(255) REFERENCES cards(card_id),
+                                card2 VARCHAR(255) REFERENCES cards(card_id),
+                                card3 VARCHAR(255) REFERENCES cards(card_id),
+                                card4 VARCHAR(255) REFERENCES cards(card_id),
+                                card5 VARCHAR(255) REFERENCES cards(card_id)
 );

@@ -13,13 +13,7 @@ import at.technikum.server.http.Response;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-
-import java.util.Date;
 import java.util.Optional;
-
-import static javax.crypto.Cipher.SECRET_KEY;
 
 public class UserController implements Controller {
 

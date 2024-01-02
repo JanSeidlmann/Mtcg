@@ -1,8 +1,6 @@
 package at.technikum.apps.mtcg.controller;
 
 import at.technikum.apps.mtcg.entity.Card;
-import at.technikum.apps.mtcg.entity.Package;
-import at.technikum.apps.mtcg.repository.DatabaseRepository;
 import at.technikum.apps.mtcg.repository.PackageRepository;
 import at.technikum.apps.mtcg.repository.Repository;
 import at.technikum.server.http.HttpContentType;
@@ -31,15 +29,15 @@ public class PackageController {
         try {
             List<Card> cards = Arrays.asList(objectMapper.readValue(request.getBody(), Card[].class));
 
-            repository.addCards(cards);
-
             String packJson = objectMapper.writeValueAsString(cards);
 
-            Response response = new Response();
-            response.setStatus(HttpStatus.CREATED);
-            response.setContentType(HttpContentType.APPLICATION_JSON);
-            response.setBody(packJson);
-            return response;
+                repository.addCards(cards);
+                Response response = new Response();
+                response.setStatus(HttpStatus.CREATED);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody(packJson);
+                return response;
+
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error processing JSON", e);
         }

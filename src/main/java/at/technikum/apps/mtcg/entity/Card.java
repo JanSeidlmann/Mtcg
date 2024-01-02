@@ -5,20 +5,11 @@ import java.util.List;
 
 public class Card {
 
-    private int package_id;
     private String card_id;
     private String name;
     private int damage;
     private String type;
     private boolean isSpell;
-
-    public int getPackage_id() {
-        return package_id;
-    }
-
-    public void setPackage_id(int package_id) {
-        this.package_id = package_id;
-    }
 
     public String getCard_id() {
         return card_id;

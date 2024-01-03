@@ -22,3 +22,8 @@ CREATE TABLE IF NOT EXISTS packages (
                                 card4 VARCHAR(255) REFERENCES cards(card_id),
                                 card5 VARCHAR(255) REFERENCES cards(card_id)
 );
+
+CREATE TABLE IF NOT EXISTS bought (
+                                card_id VARCHAR(255) PRIMARY KEY,
+                                username VARCHAR(255)
+);

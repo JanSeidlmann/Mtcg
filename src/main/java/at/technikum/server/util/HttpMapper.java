@@ -32,6 +32,12 @@ public class HttpMapper {
 
         request.setBody(httpRequest.substring(httpRequest.length() - contentLength));
 
+        // Extrahiere den Token aus dem Authorization-Header
+        String authorizationHeader = getHttpHeader("Authorization", httpRequest);
+        if (authorizationHeader != null) {
+            request.setToken(authorizationHeader);
+        }
+
         return request;
     }
 

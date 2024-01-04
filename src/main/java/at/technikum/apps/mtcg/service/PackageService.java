@@ -26,18 +26,42 @@ public class PackageService {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             List<Card> cards = Arrays.asList(objectMapper.readValue(request.getBody(), Card[].class));
+            String token = request.getToken();
 
-            String packJson = objectMapper.writeValueAsString(cards);
+            if (token == null || !token.endsWith("mtcgToken")) {
+                return createErrorResponse("Invalid token.");
+            }
 
-            repository.addCards(cards);
-            Response response = new Response();
-            response.setStatus(HttpStatus.CREATED);
-            response.setContentType(HttpContentType.APPLICATION_JSON);
-            response.setBody(packJson);
-            return response;
+            String username = extractUsernameFromToken(token);
 
+            if ("admin".equals(username)) {
+                String packJson = objectMapper.writeValueAsString(cards);
+
+                repository.addCards(cards);
+
+                Response response = new Response();
+                response.setStatus(HttpStatus.CREATED);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody(packJson);
+                return response;
+            } else {
+                return createErrorResponse("Permission denied.");
+            }
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error processing JSON", e);
         }
+    }
+
+    private Response createErrorResponse(String message) {
+        Response response = new Response();
+        response.setStatus(HttpStatus.CONFLICT);
+        response.setContentType(HttpContentType.APPLICATION_JSON);
+        response.setBody(message);
+        return response;
+    }
+
+    public String extractUsernameFromToken(String token) {
+        int tokenIndex = token.indexOf("-mtcgToken");
+        return token.substring(0, tokenIndex);
     }
 }

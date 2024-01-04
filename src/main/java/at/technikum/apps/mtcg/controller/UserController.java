@@ -5,6 +5,7 @@ import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.entity.User;
 import at.technikum.apps.mtcg.repository.DatabaseRepository;
 import at.technikum.apps.mtcg.repository.Repository;
+import at.technikum.apps.mtcg.service.TransactionService;
 import at.technikum.apps.mtcg.service.UserService;
 import at.technikum.server.http.HttpContentType;
 import at.technikum.server.http.HttpStatus;
@@ -19,16 +20,18 @@ public class UserController implements Controller {
 
     private final UserService userService;
     private final PackageController packageController;
+    private final TransactionController transactionController;
 
     public UserController() {
         this.userService = new UserService();
         this.packageController = new PackageController();
+        this.transactionController = new TransactionController();
     }
 
     @Override
     public boolean supports(String route) {
 
-        return route.startsWith("/users") || route.equals("/sessions") || route.equals("/packages");
+        return route.startsWith("/users") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages");
     }
 
     @Override
@@ -57,7 +60,7 @@ public class UserController implements Controller {
                     return loginUser(request);
                 default: return status(HttpStatus.BAD_REQUEST); // Besser 405
             }
-        } else if ( routeParts.length == 3) {
+        } else if ( routeParts.length == 3 && !request.getRoute().equals("/transactions/packages")) {
             String username = routeParts[2];
             switch (request.getMethod()) {
                 case "GET":
@@ -70,6 +73,11 @@ public class UserController implements Controller {
             switch (request.getMethod()){
                 case "POST":
                     return packageController.createPackage(request);
+            }
+        } else if (request.getRoute().equals("/transactions/packages")) {
+            switch (request.getMethod()){
+                case "POST":
+                    return transactionController.acquirePackages(request);
             }
         }
         return status(HttpStatus.BAD_REQUEST);

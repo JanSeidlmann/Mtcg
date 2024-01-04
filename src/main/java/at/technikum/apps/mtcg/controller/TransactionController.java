@@ -10,9 +10,11 @@ import at.technikum.server.http.Response;
 public class TransactionController implements Controller {
 
     private final TransactionService transactionService;
+    private final PackageService packageService;
 
     public TransactionController() {
         this.transactionService = new TransactionService();
+        this.packageService = new PackageService();
     }
 
     @Override
@@ -44,7 +46,7 @@ public class TransactionController implements Controller {
 
     public Response acquirePackages(Request request) {
         try {
-            String username = request.getParameter("username");
+            String username = packageService.extractUsernameFromToken(request.getToken());
             transactionService.acquirePackages(username);
 
             Response response = new Response();

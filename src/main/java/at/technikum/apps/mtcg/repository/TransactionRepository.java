@@ -77,8 +77,8 @@ public class TransactionRepository {
                             String cardId = cardResultSet.getString("card_id");
 
                             // Karten in die neue Tabelle 'bought' einfügen
-                            insertBoughtStmt.setString(1, cardId);
-                            insertBoughtStmt.setString(2, username);
+                            insertBoughtStmt.setString(1, username);
+                            insertBoughtStmt.setString(2, cardId);
                             insertBoughtStmt.executeUpdate();
                         }
                     }

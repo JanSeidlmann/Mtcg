@@ -18,10 +18,7 @@ public class PackageController {
         try {
             return packageService.createPackage(request);
         } catch (Exception e) {
-            Response response = new Response();
-            response.setStatus(HttpStatus.CONFLICT);
-            response.setContentType(HttpContentType.APPLICATION_JSON);
-            return response;
+            throw new RuntimeException("Failed creating package!");
         }
     }
 }

@@ -19,14 +19,14 @@ public class Request {
     // none, "{ "name": "foo" }"
     private String body;
 
-    private HeaderMap headerMap =  new HeaderMap();
+    private String token;
 
-    public HeaderMap getHeaderMap() {
-        return headerMap;
+    public String getToken() {
+        return token;
     }
 
-    public void setHeaderMap(HeaderMap headerMap) {
-        this.headerMap = headerMap;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getMethod() {

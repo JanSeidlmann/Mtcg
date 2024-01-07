@@ -21,17 +21,19 @@ public class UserController implements Controller {
     private final UserService userService;
     private final PackageController packageController;
     private final TransactionController transactionController;
+    private final CardController cardController;
 
     public UserController() {
         this.userService = new UserService();
         this.packageController = new PackageController();
         this.transactionController = new TransactionController();
+        this.cardController = new CardController();
     }
 
     @Override
     public boolean supports(String route) {
 
-        return route.startsWith("/users") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages");
+        return route.startsWith("/users") || route.equals("/cards") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages");
     }
 
     @Override
@@ -79,6 +81,12 @@ public class UserController implements Controller {
                 case "POST":
                     return transactionController.acquirePackages(request);
             }
+        } else if (request.getRoute().equals("/cards")) {
+            switch (request.getMethod()){
+                case "GET":
+                    return cardController.getCards(request);
+            }
+
         }
         return status(HttpStatus.BAD_REQUEST);
     }

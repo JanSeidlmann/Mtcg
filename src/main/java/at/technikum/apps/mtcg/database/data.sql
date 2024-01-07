@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS packages (
 );
 
 CREATE TABLE IF NOT EXISTS bought (
-                                username VARCHAR(255)PRIMARY KEY,
-                                card_id VARCHAR(255)
+                              username VARCHAR(255),
+                              card_id VARCHAR(255),
+                              PRIMARY KEY (username, card_id)
 );

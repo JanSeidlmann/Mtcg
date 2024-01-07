@@ -19,21 +19,18 @@ public class HttpMapper {
 
         // THOUGHT: don't do the content parsing in this method
         String contentLengthHeader = getHttpHeader("Content-Length", httpRequest);
-        if (null == contentLengthHeader) {
-            return request;
+        if (contentLengthHeader != null) {
+            int contentLength = Integer.parseInt(contentLengthHeader);
+            request.setContentLength(contentLength);
+
+            if (contentLength > 0) {
+                request.setBody(httpRequest.substring(httpRequest.length() - contentLength));
+            }
         }
-
-        int contentLength = Integer.parseInt(contentLengthHeader);
-        request.setContentLength(contentLength);
-
-        if (0 == contentLength) {
-            return request;
-        }
-
-        request.setBody(httpRequest.substring(httpRequest.length() - contentLength));
 
         // Extrahiere den Token aus dem Authorization-Header
         String authorizationHeader = getHttpHeader("Authorization", httpRequest);
+        System.out.println(authorizationHeader);
         if (authorizationHeader != null) {
             request.setToken(authorizationHeader);
         }
@@ -43,11 +40,14 @@ public class HttpMapper {
 
     public static String toResponseString(Response response) {
 
+        String body = response.getBody();
+        int contentLength = (body != null) ? body.length() : 0;
+
         return "HTTP/1.1 " + response.getStatusCode() + " " + response.getStatusMessage() + "\r\n" +
                 "Content-Type: " + response.getContentType() + "\r\n" +
-                "Content-Length: " + response.getBody().length() + "\r\n" +
+                "Content-Length: " + contentLength + "\r\n" +
                 "\r\n" +
-                response.getBody();
+                (body != null ? body : "");
     }
 
     // THOUGHT: Maybe some better place for this logic?

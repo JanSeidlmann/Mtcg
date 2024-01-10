@@ -28,3 +28,9 @@ CREATE TABLE IF NOT EXISTS bought (
                               card_id VARCHAR(255),
                               PRIMARY KEY (username, card_id)
 );
+
+Create TABLE IF NOT EXISTS deck (
+                            username VARCHAR(255),
+                            card_id VARCHAR(255),
+                            PRIMARY KEY (username, card_id)
+);

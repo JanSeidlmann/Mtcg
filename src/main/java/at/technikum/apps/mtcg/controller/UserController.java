@@ -14,6 +14,7 @@ import at.technikum.server.http.Response;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.util.Optional;
 
 public class UserController implements Controller {
@@ -22,18 +23,20 @@ public class UserController implements Controller {
     private final PackageController packageController;
     private final TransactionController transactionController;
     private final CardController cardController;
+    private final DeckController deckController;
 
     public UserController() {
         this.userService = new UserService();
         this.packageController = new PackageController();
         this.transactionController = new TransactionController();
         this.cardController = new CardController();
+        this.deckController = new DeckController();
     }
 
     @Override
     public boolean supports(String route) {
 
-        return route.startsWith("/users") || route.equals("/cards") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages");
+        return route.startsWith("/users") || route.equals("/cards") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages") || route.equals("/deck");
     }
 
     @Override
@@ -54,37 +57,48 @@ public class UserController implements Controller {
             switch (request.getMethod()) {
                 case "POST":
                     return createUser(request);
-                default: return status(HttpStatus.BAD_REQUEST); // Besser 405
+                default:
+                    return status(HttpStatus.BAD_REQUEST); // Besser 405
             }
         } else if (request.getRoute().equals("/sessions")) {
-            switch (request.getMethod()){
+            switch (request.getMethod()) {
                 case "POST":
                     return loginUser(request);
-                default: return status(HttpStatus.BAD_REQUEST); // Besser 405
+                default:
+                    return status(HttpStatus.BAD_REQUEST); // Besser 405
             }
-        } else if ( routeParts.length == 3 && !request.getRoute().equals("/transactions/packages")) {
+        } else if (routeParts.length == 3 && !request.getRoute().equals("/transactions/packages")) {
             String username = routeParts[2];
             switch (request.getMethod()) {
                 case "GET":
                     return findUserByUsername(username, request);
                 case "PUT":
                     return updateUserByUsername(username, request);
-                default: return status(HttpStatus.BAD_REQUEST); // Besser 405
+                default:
+                    return status(HttpStatus.BAD_REQUEST); // Besser 405
             }
         } else if (request.getRoute().equals("/packages")) {
-            switch (request.getMethod()){
+            switch (request.getMethod()) {
                 case "POST":
                     return packageController.createPackage(request);
             }
         } else if (request.getRoute().equals("/transactions/packages")) {
-            switch (request.getMethod()){
+            switch (request.getMethod()) {
                 case "POST":
                     return transactionController.acquirePackages(request);
             }
         } else if (request.getRoute().equals("/cards")) {
-            switch (request.getMethod()){
+            switch (request.getMethod()) {
                 case "GET":
                     return cardController.getCards(request);
+            }
+
+        } else if (request.getRoute().equals("/deck")) {
+            switch (request.getMethod()) {
+                case "GET":
+                    return deckController.getDeck(request);
+                case "PUT":
+                    return deckController.configureDeck(request);
             }
 
         }
@@ -117,36 +131,36 @@ public class UserController implements Controller {
         }
     }
 
-    private Response createUser(Request request){
+    private Response createUser(Request request) {
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            User user;
-            try {
-                user = objectMapper.readValue(request.getBody(), User.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-
-            try {
-                user = userService.save(user);
-
-                String userJson;
-                try {
-                    userJson = objectMapper.writeValueAsString(user);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException("Error processing JSON", e);
-                }
-
-                Response response = new Response();
-                response.setStatus(HttpStatus.CREATED);
-                response.setContentType(HttpContentType.APPLICATION_JSON);
-                response.setBody(userJson);
-
-                return response;
-            } catch (DuplicateUserException e) {
-                return status(HttpStatus.CONFLICT); // 409 Conflict status code
-            }
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user;
+        try {
+            user = objectMapper.readValue(request.getBody(), User.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
+
+        try {
+            user = userService.save(user);
+
+            String userJson;
+            try {
+                userJson = objectMapper.writeValueAsString(user);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Error processing JSON", e);
+            }
+
+            Response response = new Response();
+            response.setStatus(HttpStatus.CREATED);
+            response.setContentType(HttpContentType.APPLICATION_JSON);
+            response.setBody(userJson);
+
+            return response;
+        } catch (DuplicateUserException e) {
+            return status(HttpStatus.CONFLICT); // 409 Conflict status code
+        }
+    }
 
     private Response updateUserByUsername(String username, Request request) {
 

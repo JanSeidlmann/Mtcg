@@ -8,10 +8,9 @@ import java.sql.SQLException;
 
 public class TransactionRepository {
     private final String ENOUGH_COINS = "SELECT coins FROM users WHERE username = ?";
-    private final String DEDUCT_COINS = "UPDATE users SET coins = coins - 5 WHERE username = ?";
+    private final String DEDUCT_COINS = "UPDATE users SET coins = coins - 5 WHERE username = ?"; // Es werden 10 coins abgezogen!
     private final String SELECT_FIRST_PACKAGE = "SELECT * FROM packages LIMIT 1";
     private final String INSERT_BOUGHT = "INSERT INTO bought (username, card_id) VALUES (?, ?)";
-    private final String SELECT_CARD_ID = "SELECT card_id FROM cards WHERE card_name = ?";
     private final String DELETE_FIRST_PACKAGE = "DELETE FROM packages WHERE package_id = (SELECT package_id FROM packages LIMIT 1)";
     private final Database database = new Database();
     public boolean enoughCoins(String username){
@@ -62,25 +61,17 @@ public class TransactionRepository {
         try (
                 Connection con = database.getConnection();
                 PreparedStatement selectPackageStmt = con.prepareStatement(SELECT_FIRST_PACKAGE);
-                PreparedStatement selectCardStmt = con.prepareStatement(SELECT_CARD_ID);
                 PreparedStatement insertBoughtStmt = con.prepareStatement(INSERT_BOUGHT);
         ) {
             try (ResultSet packageResultSet = selectPackageStmt.executeQuery()) {
                 if (packageResultSet.next()) {
-                    String cardName = packageResultSet.getString("card_name");
+                    for (int i = 1; i <= 5; i++) {
+                        String cardId = packageResultSet.getString("card" + i);
 
-                    // Karteninformationen (z.B., card_id) aus der card-Tabelle holen
-                    selectCardStmt.setString(1, cardName);
-
-                    try (ResultSet cardResultSet = selectCardStmt.executeQuery()) {
-                        if (cardResultSet.next()) {
-                            String cardId = cardResultSet.getString("card_id");
-
-                            // Karten in die neue Tabelle 'bought' einfügen
-                            insertBoughtStmt.setString(1, username);
-                            insertBoughtStmt.setString(2, cardId);
-                            insertBoughtStmt.executeUpdate();
-                        }
+                        // Karten in die neue Tabelle 'bought' einfügen
+                        insertBoughtStmt.setString(1, username);
+                        insertBoughtStmt.setString(2, cardId);
+                        insertBoughtStmt.executeUpdate();
                     }
                 }
             }
@@ -88,6 +79,7 @@ public class TransactionRepository {
             throw new RuntimeException("Error inserting cards", e);
         }
     }
+
 
     public void deletePackage() {
         try (

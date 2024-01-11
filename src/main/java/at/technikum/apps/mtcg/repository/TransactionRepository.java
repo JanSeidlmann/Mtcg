@@ -49,9 +49,6 @@ public class TransactionRepository {
             if (rowsAffected == 0){
                 throw new RuntimeException("Failed to deduct coins");
             }
-
-            pstmt.executeUpdate();
-
         } catch (SQLException e){
             throw new RuntimeException("Error here", e);
         }

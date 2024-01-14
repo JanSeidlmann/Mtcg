@@ -5,6 +5,7 @@ import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.entity.User;
 import at.technikum.apps.mtcg.repository.DatabaseRepository;
 import at.technikum.apps.mtcg.repository.Repository;
+import at.technikum.apps.mtcg.service.BattleService;
 import at.technikum.apps.mtcg.service.TransactionService;
 import at.technikum.apps.mtcg.service.UserService;
 import at.technikum.server.http.HttpContentType;
@@ -24,6 +25,8 @@ public class UserController implements Controller {
     private final TransactionController transactionController;
     private final CardController cardController;
     private final DeckController deckController;
+    private final BattleController battleController;
+    private final TradingController tradingController;
 
     public UserController() {
         this.userService = new UserService();
@@ -31,12 +34,14 @@ public class UserController implements Controller {
         this.transactionController = new TransactionController();
         this.cardController = new CardController();
         this.deckController = new DeckController();
+        this.battleController = new BattleController();
+        this.tradingController = new TradingController();
     }
 
     @Override
     public boolean supports(String route) {
 
-        return route.startsWith("/users") || route.equals("/cards") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages") || route.equals("/deck");
+        return route.startsWith("/users") || route.equals("/tradings") || route.equals("/battle") || route.equals("/cards") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages") || route.equals("/deck");
     }
 
     @Override
@@ -100,7 +105,18 @@ public class UserController implements Controller {
                 case "PUT":
                     return deckController.configureDeck(request);
             }
-
+        } else if (request.getRoute().equals("/battle")){
+            switch (request.getMethod()){
+                case "POST":
+                    return battleController.startBattle(request);
+            }
+        } else if (request.getRoute().equals("/tradings")){
+            switch (request.getMethod()){
+//                case "GET":
+//                    return tradingController.getTrads(request);
+                case "POST":
+                    return tradingController.createTrade(request);
+            }
         }
         return status(HttpStatus.BAD_REQUEST);
     }

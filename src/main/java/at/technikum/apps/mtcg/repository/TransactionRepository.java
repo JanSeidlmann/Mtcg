@@ -98,12 +98,10 @@ public class TransactionRepository {
         try (
                 Connection con = database.getConnection();
         ) {
-            // Step 1: Check if the user has enough coins
             System.out.println("Checking if the user has enough coins!");
             if (enoughCoins(username))
                 throw new RuntimeException("Not enough coins!");
 
-            // Step 2: Select and insert cards into bought table
             System.out.println("Select and insert cards!");
             insertCards(username);
 
@@ -112,9 +110,6 @@ public class TransactionRepository {
 
             System.out.println("Deducting coins!");
             deductCoins(username);
-
-//            System.out.println("Updating cards into deck!");
-//            updateCardsIntoDeck(username);
 
         } catch (SQLException e) {
             e.printStackTrace();

@@ -52,7 +52,7 @@ public class PackageService {
         }
     }
 
-    private Response createErrorResponse(String message) {
+    public Response createErrorResponse(String message) {
         Response response = new Response();
         response.setStatus(HttpStatus.CONFLICT);
         response.setContentType(HttpContentType.APPLICATION_JSON);

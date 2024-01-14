@@ -34,3 +34,10 @@ Create TABLE IF NOT EXISTS deck (
                             card_id VARCHAR(255),
                             PRIMARY KEY (username, card_id)
 );
+
+Create TABLE IF NOT EXISTS trade (
+                                    trade_id VARCHAR(255) PRIMARY KEY,
+                                    card_id VARCHAR(255),
+                                    type VARCHAR(255),
+                                    damage INTEGER
+);

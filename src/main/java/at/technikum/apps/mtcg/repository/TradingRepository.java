@@ -21,6 +21,7 @@ public class TradingRepository {
     private final String UPDATE_USER_BOUGHT_CARD_SQL = "UPDATE bought SET card_id = ? WHERE username = ? AND card_id = ?";
     private final String SELECT_TRADE_DETAILS_SQL = "SELECT card_id, sellerUsername FROM trade WHERE trade_id = ?";
     private final String SELECT_USER_TRADES = "SELECT * FROM trade";
+    private final String DELETE_TRADE = "DELETE FROM trade WHERE trade_id = ?";
 
     private final Database database = new Database();
 
@@ -148,4 +149,53 @@ public class TradingRepository {
             e.printStackTrace();
         }
     }
+
+    public void deleteTrade(String tradeId, String username) {
+        try (
+                Connection con = database.getConnection();
+                PreparedStatement selectTradeStmt = con.prepareStatement("SELECT card_id, sellerUsername FROM trade WHERE trade_id = ?");
+                PreparedStatement deleteTradeStmt = con.prepareStatement("DELETE FROM trade WHERE trade_id = ?");
+        ) {
+            // Überprüfe, ob der Trade existiert und erhalte Informationen über die Karte und den Verkäufer
+            selectTradeStmt.setString(1, tradeId);
+            try (ResultSet tradeResult = selectTradeStmt.executeQuery()) {
+                if (tradeResult.next()) {
+                    String cardId = tradeResult.getString("card_id");
+                    String sellerUsername = tradeResult.getString("sellerUsername");
+
+                    // Überprüfe, ob der Benutzer die Karte besitzt
+                    if (username.equals(sellerUsername) || userHasCard(username, cardId)) {
+                        deleteTradeStmt.setString(1, tradeId);
+                        deleteTradeStmt.executeUpdate();
+                    } else {
+                        throw new RuntimeException("User is not authorized to delete this trade");
+                    }
+                } else {
+                    throw new RuntimeException("Trade not found");
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting trade", e);
+        }
+    }
+
+    public boolean userHasCard(String username, String cardId) {
+        try (
+                Connection con = database.getConnection();
+                PreparedStatement selectCardStmt = con.prepareStatement("SELECT COUNT(*) FROM bought WHERE username = ? AND card_id = ?");
+        ) {
+            selectCardStmt.setString(1, username);
+            selectCardStmt.setString(2, cardId);
+
+            try (ResultSet resultSet = selectCardStmt.executeQuery()) {
+                resultSet.next();
+                int count = resultSet.getInt(1);
+
+                return count > 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error checking if user has card", e);
+        }
+    }
+
 }

@@ -58,4 +58,19 @@ public class TradingController {
             throw new RuntimeException(e);
         }
     }
+
+    public Response deleteTrade(String tradeId, String username, Request request) {
+        try {
+            tradingService.deleteTrade(tradeId, username, request);
+
+            Response response = new Response();
+            response.setStatus(HttpStatus.OK);
+            response.setContentType(HttpContentType.APPLICATION_JSON);
+            response.setBody("Trading deal successfully deleted");
+
+            return response;
+        } catch (RuntimeException e){
+            throw new RuntimeException(e);
+        }
+    }
 }

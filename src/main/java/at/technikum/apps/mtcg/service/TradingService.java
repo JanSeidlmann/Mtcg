@@ -52,7 +52,7 @@ public class TradingService {
     }
 
 
-    public String createTrade(Request request) {
+    public String createTrade(Request request) { // void machen und Responses in Controller
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
@@ -86,5 +86,16 @@ public class TradingService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error processing JSON", e);
         }
+    }
+
+    public void deleteTrade(String tradeId, String username, Request request) {
+        String token = request.getToken();
+        if (token == null || !token.endsWith("mtcgToken")) {
+            throw new RuntimeException("Invalid Token!");
+        }
+
+        username = packageService.extractUsernameFromToken(token);
+
+        tradingRepository.deleteTrade(tradeId, username);
     }
 }

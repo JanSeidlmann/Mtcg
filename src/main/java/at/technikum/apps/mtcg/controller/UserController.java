@@ -94,6 +94,8 @@ public class UserController implements Controller {
                 switch (request.getMethod()){
                     case "POST":
                         return tradingController.tradeCards(trade_id, username, request);
+                    case "DELETE":
+                        return tradingController.deleteTrade(trade_id, username, request);
                 }
             }
         } else if (request.getRoute().equals("/packages")) {

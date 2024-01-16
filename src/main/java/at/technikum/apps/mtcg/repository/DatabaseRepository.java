@@ -19,7 +19,7 @@ import java.util.UUID;
 public class DatabaseRepository implements Repository {
     private final String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
     private final String UPDATE_USER_BY_USERNAME = "UPDATE users SET password = ?, username = ? WHERE username = ?";
-    private final String SAVE_SQL = "INSERT INTO users(id, username, password, coins) VALUES(?, ?, ?, ?)";
+    private final String SAVE_SQL = "INSERT INTO users(id, Username, Password, coins) VALUES(?, ?, ?, ?)";
     private final Database database = new Database();
 
     @Override
@@ -31,7 +31,7 @@ public class DatabaseRepository implements Repository {
             pstmt.setString(1, user.getId());
             pstmt.setString(2, user.getUsername());
             pstmt.setString(3, user.getPassword());
-            pstmt.setInt(4, user.getCoins());
+            pstmt.setInt(4, 20);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace(); // THOUGHT: how do i handle exceptions (hint: look at the TaskApp)

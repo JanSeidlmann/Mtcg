@@ -6,6 +6,7 @@ import at.technikum.apps.mtcg.entity.User;
 import at.technikum.apps.mtcg.repository.DatabaseRepository;
 import at.technikum.apps.mtcg.repository.Repository;
 import at.technikum.apps.mtcg.service.BattleService;
+import at.technikum.apps.mtcg.service.PackageService;
 import at.technikum.apps.mtcg.service.TransactionService;
 import at.technikum.apps.mtcg.service.UserService;
 import at.technikum.server.http.HttpContentType;
@@ -22,6 +23,7 @@ public class UserController implements Controller {
 
     private final UserService userService;
     private final PackageController packageController;
+    private final PackageService packageService;
     private final TransactionController transactionController;
     private final CardController cardController;
     private final DeckController deckController;
@@ -31,6 +33,7 @@ public class UserController implements Controller {
     public UserController() {
         this.userService = new UserService();
         this.packageController = new PackageController();
+        this.packageService = new PackageService();
         this.transactionController = new TransactionController();
         this.cardController = new CardController();
         this.deckController = new DeckController();
@@ -40,8 +43,9 @@ public class UserController implements Controller {
 
     @Override
     public boolean supports(String route) {
+        String[] routeParts = route.split("/");
 
-        return route.startsWith("/users") || route.equals("/tradings") || route.equals("/battle") || route.equals("/cards") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages") || route.equals("/deck");
+        return route.startsWith("/users") || (routeParts.length == 3 && "tradings".equals(routeParts[1])) || route.equals("/tradings") || route.equals("/battle") || route.equals("/cards") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages") || route.equals("/deck");
     }
 
     @Override
@@ -73,14 +77,24 @@ public class UserController implements Controller {
                     return status(HttpStatus.BAD_REQUEST); // Besser 405
             }
         } else if (routeParts.length == 3 && !request.getRoute().equals("/transactions/packages")) {
-            String username = routeParts[2];
-            switch (request.getMethod()) {
-                case "GET":
-                    return findUserByUsername(username, request);
-                case "PUT":
-                    return updateUserByUsername(username, request);
-                default:
-                    return status(HttpStatus.BAD_REQUEST); // Besser 405
+            if ("users".equals(routeParts[1])){
+                String username = routeParts[2];
+                switch (request.getMethod()) {
+                    case "GET":
+                        return findUserByUsername(username, request);
+                    case "PUT":
+                        return updateUserByUsername(username, request);
+                    default:
+                        return status(HttpStatus.BAD_REQUEST); // Besser 405
+                }
+            } else if ("tradings".equals(routeParts[1])){
+                String trade_id = routeParts[2];
+                String token = request.getToken();
+                String username = packageService.extractUsernameFromToken(token);
+                switch (request.getMethod()){
+                    case "POST":
+                        return tradingController.tradeCards(trade_id, username, request);
+                }
             }
         } else if (request.getRoute().equals("/packages")) {
             switch (request.getMethod()) {
@@ -97,7 +111,6 @@ public class UserController implements Controller {
                 case "GET":
                     return cardController.getCards(request);
             }
-
         } else if (request.getRoute().equals("/deck")) {
             switch (request.getMethod()) {
                 case "GET":
@@ -112,8 +125,8 @@ public class UserController implements Controller {
             }
         } else if (request.getRoute().equals("/tradings")){
             switch (request.getMethod()){
-//                case "GET":
-//                    return tradingController.getTrads(request);
+                case "GET":
+                    return tradingController.getTrades(request);
                 case "POST":
                     return tradingController.createTrade(request);
             }
@@ -170,11 +183,16 @@ public class UserController implements Controller {
             Response response = new Response();
             response.setStatus(HttpStatus.CREATED);
             response.setContentType(HttpContentType.APPLICATION_JSON);
-            response.setBody(userJson);
+            response.setBody("User successfully created");
 
             return response;
         } catch (DuplicateUserException e) {
-            return status(HttpStatus.CONFLICT); // 409 Conflict status code
+            Response response = new Response();
+            response.setStatus(HttpStatus.CONFLICT);
+            response.setContentType(HttpContentType.APPLICATION_JSON);
+            response.setBody("User with same username already registered");
+
+            return response;
         }
     }
 

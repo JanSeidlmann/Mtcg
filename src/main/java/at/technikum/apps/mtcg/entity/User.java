@@ -6,9 +6,9 @@ public class User {
 
     private String id;
 
-    public String username;
+    public String Username;
 
-    public String password;
+    public String Password;
 
     public int coins;
 
@@ -19,19 +19,19 @@ public class User {
     }
 
     public String getUsername() {
-        return username;
+        return Username;
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.Username = username;
     }
 
     public String getPassword() {
-        return password;
+        return Password;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.Password = password;
     }
 
     public int getCoins() {

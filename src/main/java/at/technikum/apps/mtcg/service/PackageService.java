@@ -26,42 +26,45 @@ public class PackageService {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             List<Card> cards = Arrays.asList(objectMapper.readValue(request.getBody(), Card[].class));
+
             String token = request.getToken();
-
-            if (token == null || !token.endsWith("mtcgToken")) {
-                return createErrorResponse("Invalid token.");
-            }
-
             String username = extractUsernameFromToken(token);
 
-            if ("admin".equals(username)) {
-                String packJson = objectMapper.writeValueAsString(cards);
-
+            if (!username.equals("admin")){
+                Response response = new Response();
+                response.setStatus(HttpStatus.CREATED);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody("Provided user is not \"admin\"");
+                return response;
+            } else {
                 repository.addCards(cards);
 
                 Response response = new Response();
                 response.setStatus(HttpStatus.CREATED);
                 response.setContentType(HttpContentType.APPLICATION_JSON);
-                response.setBody(packJson);
+                response.setBody("Package and cards successfully created");
                 return response;
-            } else {
-                return createErrorResponse("Permission denied.");
             }
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
             throw new RuntimeException("Error processing JSON", e);
         }
     }
 
-    public Response createErrorResponse(String message) {
-        Response response = new Response();
-        response.setStatus(HttpStatus.CONFLICT);
-        response.setContentType(HttpContentType.APPLICATION_JSON);
-        response.setBody(message);
-        return response;
+    public String extractUsernameFromToken(String token) {
+        String tokenPrefix = "Bearer ";
+        int usernameStartIndex = token.indexOf(tokenPrefix);
+
+        if (usernameStartIndex != -1) {
+            usernameStartIndex += tokenPrefix.length();
+            int tokenIndex = token.indexOf("-mtcgToken", usernameStartIndex);
+
+            if (tokenIndex != -1) {
+                return token.substring(usernameStartIndex, tokenIndex);
+            }
+        }
+
+        throw new IllegalArgumentException("Invalid token format");
     }
 
-    public String extractUsernameFromToken(String token) {
-        int tokenIndex = token.indexOf("-mtcgToken");
-        return token.substring(0, tokenIndex);
-    }
 }

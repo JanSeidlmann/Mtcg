@@ -1,38 +1,20 @@
 package at.technikum.apps.mtcg.entity;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class Card {
 
-    private String card_id;
-    private String name;
-    private int damage;
+    public String Id;
+    public String Name;
+    public int Damage;
     private String type;
-    private boolean isSpell;
 
-    public String getCard_id() {
-        return card_id;
-    }
-
-    public void setCard_id(String card_id) {
-        this.card_id = card_id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getDamage() {
-        return damage;
-    }
-
-    public void setDamage(int damage) {
-        this.damage = damage;
+    public String extractTypeFromName() {
+        if (this.Name.contains("Water")) {
+            return "Water";
+        } else if (this.Name.contains("Fire")) {
+            return "Fire";
+        } else {
+            return "Regular";
+        }
     }
 
     public String getType() {
@@ -43,11 +25,27 @@ public class Card {
         this.type = type;
     }
 
-    public boolean isSpell() {
-        return isSpell;
+    public String getId() {
+        return Id;
     }
 
-    public void setSpell(boolean spell) {
-        isSpell = spell;
+    public void setId(String id) {
+        this.Id = id;
+    }
+
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        this.Name = name;
+    }
+
+    public int getDamage() {
+        return Damage;
+    }
+
+    public void setDamage(int damage) {
+        this.Damage = damage;
     }
 }

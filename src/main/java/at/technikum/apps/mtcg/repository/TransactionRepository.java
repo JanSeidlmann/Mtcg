@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class TransactionRepository {
     private final String ENOUGH_COINS = "SELECT coins FROM users WHERE username = ?";
-    private final String DEDUCT_COINS = "UPDATE users SET coins = coins - 5 WHERE username = ?"; // Es werden 10 coins abgezogen!
+    private final String DEDUCT_COINS = "UPDATE users SET coins = coins - 5 WHERE username = ?";
     private final String SELECT_FIRST_PACKAGE = "SELECT * FROM packages LIMIT 1";
     private final String INSERT_BOUGHT = "INSERT INTO bought (username, card_id) VALUES (?, ?)";
     private final String DELETE_FIRST_PACKAGE = "DELETE FROM packages WHERE package_id = (SELECT package_id FROM packages LIMIT 1)";

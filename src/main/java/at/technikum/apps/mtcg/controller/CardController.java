@@ -19,8 +19,9 @@ public class CardController {
             return cardService.getCards(request);
         } catch (Exception e){
             Response response = new Response();
-            response.setStatus(HttpStatus.CONFLICT);
+            response.setStatus(HttpStatus.UNAUTHORIZED);
             response.setContentType(HttpContentType.APPLICATION_JSON);
+            response.setBody("Access token is missing or invalid");
             return response;
         }
     }

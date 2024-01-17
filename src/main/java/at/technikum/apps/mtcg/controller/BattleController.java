@@ -1,6 +1,6 @@
 package at.technikum.apps.mtcg.controller;
 
-import at.technikum.apps.mtcg.entity.BattleLog;
+import at.technikum.apps.mtcg.repository.BattleRepository;
 import at.technikum.apps.mtcg.service.BattleService;
 import at.technikum.apps.mtcg.service.PackageService;
 import at.technikum.server.http.HttpContentType;
@@ -8,52 +8,74 @@ import at.technikum.server.http.HttpStatus;
 import at.technikum.server.http.Request;
 import at.technikum.server.http.Response;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BattleController {
 
     private final BattleService battleService;
     private final PackageService packageService;
+
+    private final List<String> players = new ArrayList<>();
+    private final int TIMEOUT = 10;
+    private boolean battleStarted = false;
 
     public BattleController() {
         this.battleService = new BattleService();
         this.packageService = new PackageService();
     }
 
-    public Response startBattle(Request request) {
-        try {
-            // Extrahiere die Spielerinformationen aus der Anfrage
-//            String player1 = request.getParameter("player1");
-//            String player2 = request.getParameter("player2");
+    public synchronized Response startBattle(Request request) {
 
-            // Starte den Kampf und erhalte den BattleLog
-            // BattleLog battleLog = battleService.startBattle(player1, player2);
+            String token = request.getToken();
+            String player = packageService.extractUsernameFromToken(token);
+            players.add(player);
+            String player1 = players.get(0);
 
-            // Erstelle eine JSON-Repräsentation des BattleLogs für die Antwort
-            // String jsonResponse = convertBattleLogToJson(battleLog);
+            if (players.size() == 1) {
+                System.out.println("Waiting for opponent...\n");
 
-            // Erstelle die Antwort
-            Response response = new Response();
-            response.setStatus(HttpStatus.OK);
-            response.setContentType(HttpContentType.APPLICATION_JSON);
-           // response.setBody(jsonResponse);
-            return response;
+//                try {
+//                    wait(TIMEOUT * 1000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                if (!battleStarted) {
+//                    players.remove(player1);
+//
+//                    Response response = new Response();
+//                    response.setStatus(HttpStatus.OK);
+//                    response.setBody("No opponents available");
+//                    System.out.println("No opponents available");
+//                    return response;
+//                } else {
+//                    battleStarted = false;
+//                }
+            }
 
-        } catch (Exception e) {
-            // Behandele Ausnahmen und erstelle eine fehlerhafte Antwort
-            Response response = new Response();
-            response.setStatus(HttpStatus.CONFLICT);
-            response.setContentType(HttpContentType.APPLICATION_JSON);
-            response.setBody("Error starting battle: " + e.getMessage());
-            return response;
-        }
-    }
+            if (players.size() == 2) {
+                System.out.println("Game started.\n");
+                String player2 = players.get(1);
+                battleStarted = true;
+                String battleLog = battleService.startBattle(players.get(0), players.get(1));
+                System.out.println("Battle finished.");
 
-    // Diese Methode kann erweitert werden, um BattleLog in JSON zu konvertieren
-    private String convertBattleLogToJson(BattleLog battleLog) {
-        // Implementiere die Logik zur Konvertierung von BattleLog in JSON
-        // Je nach verwendeter JSON-Bibliothek kann dies variieren
-        // Ein einfaches Beispiel könnte mit Jackson wie folgt aussehen:
-        // ObjectMapper objectMapper = new ObjectMapper();
-        // return objectMapper.writeValueAsString(battleLog);
-        return "JSON representation of BattleLog";
+                notify();
+
+                players.remove(player1);
+                players.remove(player2);
+
+                Response response = new Response();
+                response.setStatus(HttpStatus.OK);
+                response.setBody(battleLog);
+                return response;
+            }
+
+        Response response = new Response();
+        response.setStatus(HttpStatus.OK);
+        response.setContentType(HttpContentType.APPLICATION_JSON);
+        response.setBody("1 Player in Lobby.\n");
+        return response;
     }
 }

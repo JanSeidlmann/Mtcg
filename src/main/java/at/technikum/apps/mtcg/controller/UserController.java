@@ -45,7 +45,7 @@ public class UserController implements Controller {
     public boolean supports(String route) {
         String[] routeParts = route.split("/");
 
-        return route.startsWith("/users") || (routeParts.length == 3 && "tradings".equals(routeParts[1])) || route.equals("/tradings") || route.equals("/battle") || route.equals("/cards") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages") || route.equals("/deck");
+        return route.startsWith("/users") || (routeParts.length == 3 && "tradings".equals(routeParts[1])) || route.equals("/tradings") || route.equals("/battles") || route.equals("/cards") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages") || route.equals("/deck");
     }
 
     @Override
@@ -120,7 +120,7 @@ public class UserController implements Controller {
                 case "PUT":
                     return deckController.configureDeck(request);
             }
-        } else if (request.getRoute().equals("/battle")){
+        } else if (request.getRoute().equals("/battles")){
             switch (request.getMethod()){
                 case "POST":
                     return battleController.startBattle(request);
@@ -139,30 +139,34 @@ public class UserController implements Controller {
 
     private Response findUserByUsername(String username, Request request) {
         Optional<User> userOptional = userService.findUserByUsername(username);
+        String token = request.getToken();
+        String tokenUsername = packageService.extractUsernameFromToken(token);
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
+        if(!username.equals(tokenUsername)) {
+            Response response = new Response();
+            response.setStatus(HttpStatus.UNAUTHORIZED);
+            response.setContentType(HttpContentType.APPLICATION_JSON);
+            response.setBody("Access token is missing or invalid");
 
-            String userJson;
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                userJson = objectMapper.writeValueAsString(user);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("Error processing JSON", e);
-            }
-
+            return response;
+        } else if (userOptional.isPresent() || username.equals("admin")) {
             Response response = new Response();
             response.setStatus(HttpStatus.OK);
             response.setContentType(HttpContentType.APPLICATION_JSON);
-            response.setBody(userJson);
+            response.setBody("Data successfully retrieved");
 
             return response;
         } else {
-            return status(HttpStatus.NOT_FOUND);
+            Response response = new Response();
+            response.setStatus(HttpStatus.NOT_FOUND);
+            response.setContentType(HttpContentType.APPLICATION_JSON);
+            response.setBody("User not found.");
+
+            return response;
         }
     }
 
-    private Response createUser(Request request) {
+    public Response createUser(Request request) {
 
         ObjectMapper objectMapper = new ObjectMapper();
         User user;
@@ -173,14 +177,7 @@ public class UserController implements Controller {
         }
 
         try {
-            user = userService.save(user);
-
-            String userJson;
-            try {
-                userJson = objectMapper.writeValueAsString(user);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("Error processing JSON", e);
-            }
+            userService.save(user);
 
             Response response = new Response();
             response.setStatus(HttpStatus.CREATED);
@@ -232,12 +229,12 @@ public class UserController implements Controller {
         }
     }
 
-    private Response loginUser(Request request) {
+    public Response loginUser(Request request) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             JsonNode jsonNode = objectMapper.readTree(request.getBody()); // Geht anders mit objectmapper damit gleich
-            String username = jsonNode.get("username").asText();
-            String password = jsonNode.get("password").asText();
+            String username = jsonNode.get("Username").asText();
+            String password = jsonNode.get("Password").asText();
 
             Optional<User> existingUserOptional = userService.login(username, password);
 
@@ -245,11 +242,16 @@ public class UserController implements Controller {
                 Response response = new Response();
                 response.setStatus(HttpStatus.OK);
                 response.setContentType(HttpContentType.APPLICATION_JSON);
-                response.setBody("Successfully logged in!");
+                response.setBody("User login successful");
 
                 return response;
             } else {
-                return status(HttpStatus.UNAUTHORIZED);
+                Response response = new Response();
+                response.setStatus(HttpStatus.UNAUTHORIZED);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody("Invalid username/password provided");
+
+                return response;
             }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

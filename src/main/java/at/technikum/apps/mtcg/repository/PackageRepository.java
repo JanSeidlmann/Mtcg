@@ -15,7 +15,7 @@ import java.util.UUID;
 public class PackageRepository implements Repository {
 
     private final String SAVE_PACKAGE_SQL = "INSERT INTO packages (card1, card2, card3, card4, card5) VALUES (?, ?, ? ,? ,?)";
-    private final String SAVE_CARD_SQL = "INSERT INTO cards (card_id, name, damage, type, isSpell) VALUES (?, ?, ?, ?, ?)";
+    private final String SAVE_CARD_SQL = "INSERT INTO cards (Id, Name, Damage, Type) VALUES (?, ?, ?, ?)";
     private final Database database = new Database();
 
     @Override
@@ -37,16 +37,15 @@ public class PackageRepository implements Repository {
             for (int i = 0; i < newCards.size(); i++){
                 Card card = newCards.get(i);
 
-                pstmt1.setString(1, card.getCard_id());
+                pstmt1.setString(1, card.getId());
                 pstmt1.setString(2, card.getName());
                 pstmt1.setInt(3, card.getDamage());
-                pstmt1.setString(4, card.getType());
-                pstmt1.setBoolean(5, card.isSpell());
+                pstmt1.setString(4, card.extractTypeFromName());
                 pstmt1.executeUpdate();
             }
 
             for (int i = 0; i < newCards.size(); i++) {
-                pstmt2.setString(i + 1, newCards.get(i).getCard_id());
+                pstmt2.setString(i + 1, newCards.get(i).getId());
             }
             pstmt2.executeUpdate();
 

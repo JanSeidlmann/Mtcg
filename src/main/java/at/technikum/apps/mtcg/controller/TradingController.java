@@ -17,6 +17,13 @@ public class TradingController {
         try {
             String trades = tradingService.getTrades();
 
+            if(trades.isEmpty()){
+                Response response = new Response();
+                response.setStatus(HttpStatus.NO_CONTENT);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody("The request was fine, but there are no trading deals available");
+            }
+
             Response response = new Response();
             response.setStatus(HttpStatus.OK);
             response.setContentType(HttpContentType.APPLICATION_JSON);
@@ -31,14 +38,7 @@ public class TradingController {
 
     public Response createTrade(Request request) {
         try {
-            tradingService.createTrade(request);
-
-            Response response = new Response();
-            response.setStatus(HttpStatus.OK);
-            response.setContentType(HttpContentType.APPLICATION_JSON);
-            response.setBody("Trading deal successfully created");
-
-            return response;
+            return tradingService.createTrade(request);
         } catch (RuntimeException e){
             throw new RuntimeException(e);
         }
@@ -51,7 +51,7 @@ public class TradingController {
             Response response = new Response();
             response.setStatus(HttpStatus.OK);
             response.setContentType(HttpContentType.APPLICATION_JSON);
-            response.setBody("Trading deal successfully executed");
+            response.setBody("Trading deal successfully executed.");
 
             return response;
         } catch (RuntimeException e){

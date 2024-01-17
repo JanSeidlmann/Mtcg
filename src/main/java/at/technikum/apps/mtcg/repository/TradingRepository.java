@@ -22,6 +22,7 @@ public class TradingRepository {
     private final String SELECT_TRADE_DETAILS_SQL = "SELECT card_id, sellerUsername FROM trade WHERE trade_id = ?";
     private final String SELECT_USER_TRADES = "SELECT * FROM trade";
     private final String DELETE_TRADE = "DELETE FROM trade WHERE trade_id = ?";
+    private final String SELECT_COUNT = "SELECT COUNT(*) FROM bought WHERE username = ? AND card_id = ?";
 
     private final Database database = new Database();
 
@@ -153,8 +154,8 @@ public class TradingRepository {
     public void deleteTrade(String tradeId, String username) {
         try (
                 Connection con = database.getConnection();
-                PreparedStatement selectTradeStmt = con.prepareStatement("SELECT card_id, sellerUsername FROM trade WHERE trade_id = ?");
-                PreparedStatement deleteTradeStmt = con.prepareStatement("DELETE FROM trade WHERE trade_id = ?");
+                PreparedStatement selectTradeStmt = con.prepareStatement(SELECT_TRADE_DETAILS_SQL);
+                PreparedStatement deleteTradeStmt = con.prepareStatement(DELETE_TRADE);
         ) {
             // Überprüfe, ob der Trade existiert und erhalte Informationen über die Karte und den Verkäufer
             selectTradeStmt.setString(1, tradeId);
@@ -182,7 +183,7 @@ public class TradingRepository {
     public boolean userHasCard(String username, String cardId) {
         try (
                 Connection con = database.getConnection();
-                PreparedStatement selectCardStmt = con.prepareStatement("SELECT COUNT(*) FROM bought WHERE username = ? AND card_id = ?");
+                PreparedStatement selectCardStmt = con.prepareStatement(SELECT_COUNT);
         ) {
             selectCardStmt.setString(1, username);
             selectCardStmt.setString(2, cardId);

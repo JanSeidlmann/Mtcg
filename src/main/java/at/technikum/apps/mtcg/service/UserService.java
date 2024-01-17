@@ -14,10 +14,12 @@ import java.util.UUID;
 public class UserService {
 
     private final Repository repository;
+    private final PackageService packageService;
 
-    public UserService() { this.repository = new DatabaseRepository(); }
-
-    public Optional<User> findUser(int id) { return Optional.empty(); }
+    public UserService() {
+        this.repository = new DatabaseRepository();
+        this.packageService = new PackageService();
+    }
 
     public Optional<User> findUserByUsername(String username) {
         return repository.findUserByUsername(username);

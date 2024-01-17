@@ -16,6 +16,7 @@ public class DeckController {
         try {
             return deckService.getDeck(request);
         } catch (Exception e) {
+            e.printStackTrace();
             return createErrorResponse("Error getting user deck");
         }
     }

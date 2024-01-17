@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CardRepository {
-    private final String SELECT_USER_CARDS = "SELECT * FROM cards WHERE card_id IN (SELECT card_id FROM bought WHERE username = ?) LIMIT 20";
+    private final String SELECT_USER_CARDS = "SELECT * FROM cards WHERE id IN (SELECT card_id FROM bought WHERE username = ?) LIMIT 20";
     private final Database database = new Database();
 
     public List<Card> getCards(String username) {
@@ -26,11 +26,9 @@ public class CardRepository {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Card card = new Card();
-                    card.setCard_id(rs.getString("card_id"));
+                    card.setId(rs.getString("id"));
                     card.setName(rs.getString("name"));
                     card.setDamage(rs.getInt("damage"));
-                    card.setType(rs.getString("type"));
-                    card.setSpell(rs.getBoolean("isSpell"));
 
                     userCards.add(card);
                 }

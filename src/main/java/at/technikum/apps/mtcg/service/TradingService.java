@@ -52,14 +52,17 @@ public class TradingService {
     }
 
 
-    public String createTrade(Request request) { // void machen und Responses in Controller
+    public Response createTrade(Request request) { // void machen und Responses in Controller
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
             String token = request.getToken();
 
             if (token == null || !token.endsWith("mtcgToken")) {
-                return "Invalid Token!";
+                Response response = new Response();
+                response.setStatus(HttpStatus.UNAUTHORIZED);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody("Access token is missing or invalid");
             }
 
             String username = packageService.extractUsernameFromToken(token);
@@ -68,21 +71,32 @@ public class TradingService {
 
             List<String> userCards = tradingRepository.getCards();
             boolean cardBelongsToUser = userCards.contains(card_id);
-
-            if (!cardBelongsToUser) {
-                return "The card does not belong to the user!";
-            }
-
             List<String> userDeck = tradingRepository.getDeck(username);
             boolean cardInUserDeck = userDeck.contains(card_id);
 
-            if (cardInUserDeck) {
-                return "The card is already in the user's deck!";
+            if (!cardBelongsToUser || cardInUserDeck) {
+                Response response = new Response();
+                response.setStatus(HttpStatus.FORBIDDEN);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody("The deal contains a card that is not owned by the user or locked in the deck");
             }
+
+            List<Trade> tradeList = tradingRepository.getTrades();
+
+//            if (tradeList.getFirst().getTrade_id().equals(trade.getTrade_id())){
+//                Response response = new Response();
+//                response.setStatus(HttpStatus.UNAUTHORIZED);
+//                response.setContentType(HttpContentType.APPLICATION_JSON);
+//                response.setBody("A deal with this deal ID already exists.");
+//            }
 
             tradingRepository.createTrade(request, trade.getTrade_id(), trade.getCard_id(), trade.getType(), trade.getDamage());
 
-            return username;
+            Response response = new Response();
+            response.setStatus(HttpStatus.CREATED);
+            response.setContentType(HttpContentType.APPLICATION_JSON);
+            response.setBody("Trading deal successfully created");
+            return response;
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error processing JSON", e);
         }

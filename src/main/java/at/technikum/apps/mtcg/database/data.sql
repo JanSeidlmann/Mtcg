@@ -7,19 +7,19 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS cards (
-                        card_id VARCHAR(255) PRIMARY KEY,
-                        name VARCHAR(255),
-                        damage INTEGER,
-                        type VARCHAR(255)
+                        Id VARCHAR(255) PRIMARY KEY,
+                        Name VARCHAR(255),
+                        Damage INTEGER,
+                        Type VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS packages (
                                 package_id SERIAL PRIMARY KEY,
-                                card1 VARCHAR(255) REFERENCES cards(card_id),
-                                card2 VARCHAR(255) REFERENCES cards(card_id),
-                                card3 VARCHAR(255) REFERENCES cards(card_id),
-                                card4 VARCHAR(255) REFERENCES cards(card_id),
-                                card5 VARCHAR(255) REFERENCES cards(card_id)
+                                card1 VARCHAR(255) REFERENCES cards(Id),
+                                card2 VARCHAR(255) REFERENCES cards(Id),
+                                card3 VARCHAR(255) REFERENCES cards(Id),
+                                card4 VARCHAR(255) REFERENCES cards(Id),
+                                card5 VARCHAR(255) REFERENCES cards(Id)
 );
 
 CREATE TABLE IF NOT EXISTS bought (
@@ -40,4 +40,12 @@ Create TABLE IF NOT EXISTS trade (
                                     type VARCHAR(255),
                                     damage INTEGER,
                                     sellerUsername VARCHAR(255)
+);
+
+Create TABLE IF NOT EXISTS stats (
+                                     username VARCHAR(255) PRIMARY KEY,
+                                     totalGames INTEGER,
+                                     gamesWon INTEGER,
+                                     gamesLost INTEGER,
+                                     elo INTEGER
 );

@@ -11,7 +11,7 @@ import at.technikum.server.http.Response;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BattleController {
+public class BattleController implements Controller {
 
     private final BattleService battleService;
     private final PackageService packageService;
@@ -23,6 +23,29 @@ public class BattleController {
     public BattleController() {
         this.battleService = new BattleService();
         this.packageService = new PackageService();
+    }
+
+    @Override
+    public boolean supports(String route) {
+      return route.equals("/battles");
+    }
+
+    @Override
+    public Response status(HttpStatus httpStatus) {
+      Response response = new Response();
+      response.setStatus(httpStatus);
+      response.setContentType(HttpContentType.APPLICATION_JSON);
+      response.setBody("{ \"error\": \"" + httpStatus.getMessage() + "\"}");
+
+      return response;
+    }
+
+    @Override
+    public Response handle(Request request) {
+      if (request.getRoute().equals("/battles") && (request.getMethod().equals("POST"))) {
+          return startBattle(request);
+      }
+      return status(HttpStatus.BAD_REQUEST);
     }
 
     public synchronized Response startBattle(Request request) {
@@ -61,7 +84,7 @@ public class BattleController {
                 String battleLog = battleService.startBattle(players.get(0), players.get(1));
                 System.out.println("Battle finished.");
 
-                notify();
+                notifyAll();
 
                 players.remove(player1);
                 players.remove(player2);

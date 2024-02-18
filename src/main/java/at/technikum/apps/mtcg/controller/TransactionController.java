@@ -22,7 +22,6 @@ public class TransactionController implements Controller {
 
     @Override
     public boolean supports(String route) {
-
         return route.startsWith("/transactions");
     }
 
@@ -38,11 +37,8 @@ public class TransactionController implements Controller {
 
     @Override
     public Response handle(Request request) {
-        if (request.getRoute().startsWith("/transactions")) {
-            switch (request.getMethod()){
-                case "POST":
-                    return acquirePackages(request);
-            }
+        if (request.getRoute().startsWith("/transactions") && (request.getMethod().equals("POST"))) {
+            return acquirePackages(request);
         }
         return status(HttpStatus.BAD_REQUEST);
     }

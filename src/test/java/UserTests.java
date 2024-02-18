@@ -9,6 +9,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class UserTests {
-
-
+  MtcgApp mtcgApp = new MtcgApp();
+//  @Test
+//  void createUser() {
+//    Request request = new Request();
+//    request.setMethod(HttpMethod.POST);
+//    request.setRoute("http://localhost:10001/users");
+//    request.setContentType(HttpContentType.APPLICATION_JSON.getMimeType());
+//    request.setBody("{\"username\":\"kienboec\", \"password\":\"daniel\"}");
+//
+//    Response response = mtcgApp.handle(request);
+//
+//    assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
+//  }
 }

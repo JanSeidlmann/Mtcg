@@ -28,6 +28,7 @@ public class Server {
                 Socket socket = server.accept();
 
                 RequestHandler handler = new RequestHandler(socket, app);
+
                 handler.handle();
 
             } catch (IOException e) {

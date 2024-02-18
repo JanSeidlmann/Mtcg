@@ -1,13 +1,8 @@
 package at.technikum.apps.mtcg.controller;
 
 import at.technikum.apps.mtcg.Exception.DuplicateUserException;
-import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.entity.User;
-import at.technikum.apps.mtcg.repository.DatabaseRepository;
-import at.technikum.apps.mtcg.repository.Repository;
-import at.technikum.apps.mtcg.service.BattleService;
 import at.technikum.apps.mtcg.service.PackageService;
-import at.technikum.apps.mtcg.service.TransactionService;
 import at.technikum.apps.mtcg.service.UserService;
 import at.technikum.server.http.HttpContentType;
 import at.technikum.server.http.HttpStatus;
@@ -22,30 +17,16 @@ import java.util.Optional;
 public class UserController implements Controller {
 
     private final UserService userService;
-    private final PackageController packageController;
     private final PackageService packageService;
-    private final TransactionController transactionController;
-    private final CardController cardController;
-    private final DeckController deckController;
-    private final BattleController battleController;
-    private final TradingController tradingController;
 
     public UserController() {
         this.userService = new UserService();
-        this.packageController = new PackageController();
         this.packageService = new PackageService();
-        this.transactionController = new TransactionController();
-        this.cardController = new CardController();
-        this.deckController = new DeckController();
-        this.battleController = new BattleController();
-        this.tradingController = new TradingController();
     }
 
     @Override
     public boolean supports(String route) {
-        String[] routeParts = route.split("/");
-
-        return route.startsWith("/users") || (routeParts.length == 3 && "tradings".equals(routeParts[1])) || route.equals("/tradings") || route.equals("/battles") || route.equals("/cards") || route.equals("/sessions") || route.equals("/packages") || route.equals("/transactions/packages") || route.equals("/deck");
+        return route.startsWith("/users") || route.equals("/sessions");
     }
 
     @Override
@@ -76,8 +57,7 @@ public class UserController implements Controller {
                 default:
                     return status(HttpStatus.BAD_REQUEST); // Besser 405
             }
-        } else if (routeParts.length == 3 && !request.getRoute().equals("/transactions/packages")) {
-            if ("users".equals(routeParts[1])){
+        } else if (routeParts.length == 3) {
                 String username = routeParts[2];
                 switch (request.getMethod()) {
                     case "GET":
@@ -86,56 +66,10 @@ public class UserController implements Controller {
                         return updateUserByUsername(username, request);
                     default:
                         return status(HttpStatus.BAD_REQUEST); // Besser 405
-                }
-            } else if ("tradings".equals(routeParts[1])){
-                String trade_id = routeParts[2];
-                String token = request.getToken();
-                String username = packageService.extractUsernameFromToken(token);
-                switch (request.getMethod()){
-                    case "POST":
-                        return tradingController.tradeCards(trade_id, username, request);
-                    case "DELETE":
-                        return tradingController.deleteTrade(trade_id, username, request);
-                }
-            }
-        } else if (request.getRoute().equals("/packages")) {
-            switch (request.getMethod()) {
-                case "POST":
-                    return packageController.createPackage(request);
-            }
-        } else if (request.getRoute().equals("/transactions/packages")) {
-            switch (request.getMethod()) {
-                case "POST":
-                    return transactionController.acquirePackages(request);
-            }
-        } else if (request.getRoute().equals("/cards")) {
-            switch (request.getMethod()) {
-                case "GET":
-                    return cardController.getCards(request);
-            }
-        } else if (request.getRoute().equals("/deck")) {
-            switch (request.getMethod()) {
-                case "GET":
-                    return deckController.getDeck(request);
-                case "PUT":
-                    return deckController.configureDeck(request);
-            }
-        } else if (request.getRoute().equals("/battles")){
-            switch (request.getMethod()){
-                case "POST":
-                    return battleController.startBattle(request);
-            }
-        } else if (request.getRoute().equals("/tradings")){
-            switch (request.getMethod()){
-                case "GET":
-                    return tradingController.getTrades(request);
-                case "POST":
-                    return tradingController.createTrade(request);
             }
         }
         return status(HttpStatus.BAD_REQUEST);
     }
-
 
     private Response findUserByUsername(String username, Request request) {
         Optional<User> userOptional = userService.findUserByUsername(username);

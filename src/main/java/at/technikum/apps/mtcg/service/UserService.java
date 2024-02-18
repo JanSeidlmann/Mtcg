@@ -1,13 +1,11 @@
 package at.technikum.apps.mtcg.service;
 
 import at.technikum.apps.mtcg.Exception.DuplicateUserException;
-import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.entity.User;
 import at.technikum.apps.mtcg.repository.DatabaseRepository;
 import at.technikum.apps.mtcg.repository.Repository;
 import at.technikum.server.http.Request;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

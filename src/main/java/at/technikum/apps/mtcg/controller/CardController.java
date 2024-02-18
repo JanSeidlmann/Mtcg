@@ -1,6 +1,8 @@
 package at.technikum.apps.mtcg.controller;
 
+import at.technikum.apps.mtcg.repository.CardRepository;
 import at.technikum.apps.mtcg.service.CardService;
+import at.technikum.apps.mtcg.service.PackageService;
 import at.technikum.server.http.HttpContentType;
 import at.technikum.server.http.HttpStatus;
 import at.technikum.server.http.Request;
@@ -9,6 +11,8 @@ import at.technikum.server.http.Response;
 public class CardController implements Controller {
 
     private final CardService cardService;
+    private final CardRepository cardRepository = new CardRepository();
+    private final PackageService packageService = new PackageService();
 
     @Override
     public boolean supports(String route) {
@@ -37,7 +41,7 @@ public class CardController implements Controller {
     }
 
     public CardController() {
-        this.cardService = new CardService();
+        this.cardService = new CardService(cardRepository, packageService);
     }
 
     public Response getCards(Request request) {

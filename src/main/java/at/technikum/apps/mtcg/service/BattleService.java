@@ -1,14 +1,9 @@
 package at.technikum.apps.mtcg.service;
 
-import at.technikum.apps.mtcg.database.Database;
 import at.technikum.apps.mtcg.entity.Card;
-import at.technikum.apps.mtcg.entity.Stats;
 import at.technikum.apps.mtcg.repository.BattleRepository;
 import at.technikum.apps.mtcg.repository.DeckRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.List;
 

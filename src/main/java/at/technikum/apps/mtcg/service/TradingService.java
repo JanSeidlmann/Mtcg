@@ -1,6 +1,5 @@
 package at.technikum.apps.mtcg.service;
 
-import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.entity.Trade;
 import at.technikum.apps.mtcg.repository.TradingRepository;
 import at.technikum.server.http.HttpContentType;
@@ -8,7 +7,6 @@ import at.technikum.server.http.HttpStatus;
 import at.technikum.server.http.Request;
 import at.technikum.server.http.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -2,7 +2,6 @@ package at.technikum.apps.mtcg.repository;
 
 import at.technikum.apps.mtcg.database.Database;
 import at.technikum.apps.mtcg.entity.Card;
-import at.technikum.apps.mtcg.entity.Package;
 import at.technikum.apps.mtcg.entity.User;
 import at.technikum.server.http.Request;
 import com.fasterxml.jackson.core.JsonProcessingException;

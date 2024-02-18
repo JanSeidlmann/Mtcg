@@ -1,7 +1,6 @@
 package at.technikum.apps.mtcg.service;
 
 import at.technikum.apps.mtcg.entity.Card;
-import at.technikum.apps.mtcg.repository.CardRepository;
 import at.technikum.apps.mtcg.repository.DeckRepository;
 import at.technikum.server.http.HttpContentType;
 import at.technikum.server.http.HttpStatus;
@@ -12,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DeckService {
@@ -85,12 +83,20 @@ public class DeckService {
 
             deckRepository.configureDeck(username, cardIds);
 
-            Response response = new Response();
-            response.setStatus(HttpStatus.OK);
-            response.setContentType(HttpContentType.APPLICATION_JSON);
-            response.setBody("The deck has been successfully configured");
-            return response;
-
+            if (request.getContentType().equals("application/json")){
+                Response response = new Response();
+                response.setStatus(HttpStatus.OK);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody("The deck has been successfully configured");
+                return response;
+            }
+            else {
+                Response response = new Response();
+                response.setStatus(HttpStatus.OK);
+                response.setContentType(HttpContentType.TEXT_PLAIN);
+                response.setBody("The deck has been successfully configured");
+                return response;
+            }
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error processing JSON", e);
         }

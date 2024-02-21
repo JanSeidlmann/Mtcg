@@ -69,4 +69,12 @@ public class CardTest {
         assertEquals(HttpStatus.NO_CONTENT.getCode(), response.getStatusCode());
         assertEquals("The request was fine, but the user doesn't have any cards", response.getBody());
     }
+
+    @Test
+    void testExtractTypeFromName() {
+        Card card = new Card();
+        card.setName("WaterCard");
+
+        assertEquals("Water", card.extractTypeFromName());
+    }
 }

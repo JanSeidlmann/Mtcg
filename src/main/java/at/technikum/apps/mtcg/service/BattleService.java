@@ -64,7 +64,7 @@ public class BattleService {
                 player2_deck.add(card2);
             } else {
                 player1_deck.add(card1);
-                player2_deck.add(card1);
+                player2_deck.add(card2);
             }
 
             if (player1_deck.isEmpty()) {
@@ -102,6 +102,28 @@ public class BattleService {
     }
 
     private BattleOutcome calculateRoundResult(Card card1, Card card2) {
+        // Autowins because of special ability
+        if(player1Card.getName().contains("Goblin") && player2Card.getName().contains("Dragon")) {
+            return Result.Player2_Win;
+        } else if(player1Card.getName().contains("Dragon") && player2Card.getName().contains("Goblin")) {
+            return Result.Player1_Win;
+        } else if(player1Card.getName().contains("Wizard") && player2Card.getName().contains("Ork")) {
+            return Result.Player1_Win;
+        } else if(player1Card.getName().contains("Ork") && player2Card.getName().contains("Wizard")) {
+            return Result.Player2_Win;
+        } else if(player1Card.getName().contains("Knights") && player2Card.getName().contains("Water")) {
+            return Result.Player2_Win;
+        } else if(player1Card.getName().contains("Water") && player2Card.getName().contains("Knights")) {
+            return Result.Player1_Win;
+        } else if(player1Card.getName().contains("Kraken") && player2Card.getName().contains("Spell")) {
+            return Result.Player1_Win;
+        } else if (player1Card.getName().contains("Spell") && player2Card.getName().contains("Kraken")) {
+            return Result.Player2_Win;
+        } else if (player1Card.getName().contains("FireElf") && player2Card.getName().contains("Dragon")) {
+            return Result.Player1_Win;
+        } else if (player1Card.getName().contains("Dragon") && player2Card.getName().contains("FireElf")) {
+            return Result.Player2_Win;
+        }
         if (isMonster(card1) && isMonster(card2)) {
             return calculateMonsterRoundResult(card1, card2);
         } else {

@@ -24,6 +24,11 @@ public class UserController implements Controller {
         this.packageService = new PackageService();
     }
 
+    public UserController(UserService userService, PackageService packageService){
+        this.userService = userService;
+        this.packageService = packageService;
+    }
+
     @Override
     public boolean supports(String route) {
         return route.startsWith("/users") || route.equals("/sessions");

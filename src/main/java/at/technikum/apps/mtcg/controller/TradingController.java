@@ -1,5 +1,6 @@
 package at.technikum.apps.mtcg.controller;
 
+import at.technikum.apps.mtcg.repository.TradingRepository;
 import at.technikum.apps.mtcg.service.PackageService;
 import at.technikum.apps.mtcg.service.TradingService;
 import at.technikum.server.http.HttpContentType;
@@ -9,10 +10,12 @@ import at.technikum.server.http.Response;
 
 public class TradingController implements Controller {
     private final TradingService tradingService;
+    private final TradingRepository tradingRepository;
     private final PackageService packageService;
 
     public TradingController() {
         this.tradingService = new TradingService();
+        this.tradingRepository = new TradingRepository();
         this.packageService = new PackageService();
     }
 
@@ -37,7 +40,7 @@ public class TradingController implements Controller {
     public Response handle(Request request) {
         String[] routeParts = request.getRoute().split("/");
 
-        if ("tradings".equals(routeParts[1])){
+        if ("tradings".equals(routeParts[1]) && routeParts.length > 2){
             String trade_id = routeParts[2];
             String token = request.getToken();
             String username = packageService.extractUsernameFromToken(token);
@@ -95,6 +98,16 @@ public class TradingController implements Controller {
 
     public Response tradeCards(String tradeId,String buyerUsername, Request request) {
         try {
+            String sellerUsername = tradingRepository.selectSellerUsername(tradeId);
+
+            if (sellerUsername.equals(buyerUsername)){
+                Response response = new Response();
+                response.setStatus(HttpStatus.CONFLICT);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody("You can't trade with yourself");
+                return response;
+            }
+
             tradingService.tradeCards(tradeId, buyerUsername, request);
 
             Response response = new Response();

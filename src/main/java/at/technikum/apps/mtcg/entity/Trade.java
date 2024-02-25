@@ -1,10 +1,16 @@
 package at.technikum.apps.mtcg.entity;
 
+import java.util.UUID;
+
 public class Trade {
     private String trade_id;
     private String card_id;
     private int damage;
     private String type;
+
+    public Trade() {
+        this.trade_id = UUID.randomUUID().toString();
+    }
 
     public String getTrade_id() {
         return trade_id;

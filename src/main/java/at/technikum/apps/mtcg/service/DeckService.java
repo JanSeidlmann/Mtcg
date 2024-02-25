@@ -1,7 +1,6 @@
 package at.technikum.apps.mtcg.service;
 
 import at.technikum.apps.mtcg.entity.Card;
-import at.technikum.apps.mtcg.repository.CardRepository;
 import at.technikum.apps.mtcg.repository.DeckRepository;
 import at.technikum.server.http.HttpContentType;
 import at.technikum.server.http.HttpStatus;
@@ -12,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DeckService {
@@ -85,12 +83,38 @@ public class DeckService {
 
             deckRepository.configureDeck(username, cardIds);
 
-            Response response = new Response();
-            response.setStatus(HttpStatus.OK);
-            response.setContentType(HttpContentType.APPLICATION_JSON);
-            response.setBody("The deck has been successfully configured");
-            return response;
+                Response response = new Response();
+                response.setStatus(HttpStatus.OK);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody("The deck has been successfully configured");
+                return response;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error processing JSON", e);
+        }
+    }
 
+    public Response getDeckPlain(Request request) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String token = request.getToken();
+            String username = packageService.extractUsernameFromToken(token);
+
+            List<Card> deck = deckRepository.getDeck(username);
+
+            String deckJson = objectMapper.writeValueAsString(deck);
+
+          Response response = new Response();
+
+          if(!deck.isEmpty()) {
+            response.setStatus(HttpStatus.OK);
+                response.setContentType(HttpContentType.TEXT_PLAIN);
+                response.setBody("The deck has cards, the response contains these" + deckJson);
+          } else {
+            response.setStatus(HttpStatus.NO_CONTENT);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody("The request was fine, but the deck doesn't have any cards");
+          }
+          return response;
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error processing JSON", e);
         }

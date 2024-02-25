@@ -1,14 +1,11 @@
 package at.technikum.apps.mtcg.service;
 
-import at.technikum.apps.mtcg.database.Database;
 import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.entity.Stats;
 import at.technikum.apps.mtcg.repository.BattleRepository;
 import at.technikum.apps.mtcg.repository.DeckRepository;
+import at.technikum.apps.mtcg.repository.StatsRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,6 +14,7 @@ public class BattleService {
 
     private final DeckRepository deckRepository;
     private final BattleRepository battleRepository;
+    private final StatsRepository statsRepository;
     StringBuilder battleLogger = new StringBuilder();
 
 
@@ -24,6 +22,7 @@ public class BattleService {
     public BattleService() {
         this.deckRepository = new DeckRepository();
         this.battleRepository = new BattleRepository();
+        this.statsRepository = new StatsRepository();
 
     }
 
@@ -42,7 +41,7 @@ public class BattleService {
 
         BattleOutcome result = battle(player1, player2, deckA, deckB);
         battleLogger.append("\n").append(getWinner(player1, player2, result));
-        battleRepository.updateStats(player1, player2, result);
+        statsRepository.updateStats(player1, player2, result);
 
         return battleLogger.toString();
     }
@@ -69,8 +68,10 @@ public class BattleService {
             }
 
             if (player1_deck.isEmpty()) {
+                battleRepository.getReward(player2);
                 return BattleOutcome.PLAYER2_WIN;
             } else if (player2_deck.isEmpty()) {
+                battleRepository.getReward(player1);
                 return BattleOutcome.PLAYER1_WIN;
             }
 
@@ -109,9 +110,6 @@ public class BattleService {
     }
 
     private BattleOutcome calculateMonsterRoundResult(Card monster1, Card monster2) {
-        // Implement monster-specific rules
-
-        // Placeholder logic for now, where the one with higher damage wins
         int damage1 = monster1.getDamage();
         int damage2 = monster2.getDamage();
 
@@ -149,7 +147,6 @@ public class BattleService {
             }
 
         }
-        // Placeholder logic for now, where the one with higher damage wins
         int card1Damage = card1.getDamage();
         int card2Damage = card2.getDamage();
 

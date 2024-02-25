@@ -16,8 +16,9 @@ import java.util.List;
 public class TradingRepository {
 
     private final String SAVE_TRADE_SQL = "INSERT INTO trade (trade_id, card_id, type, damage, sellerUsername) VALUES (?, ?, ?, ?, ?)";
-    private final String SELECT_USER_CARDS = "SELECT card_id FROM cards";
+    private final String SELECT_USER_CARDS = "SELECT card_id FROM bought WHERE username = ?";
     private final String SELECT_USER_DECK = "SELECT card_id FROM deck WHERE username = ?";
+    private final String SELECT_SELLERUSER = "SELECT sellerusername FROM trade WHERE trade_id = ?";
     private final String UPDATE_USER_BOUGHT_CARD_SQL = "UPDATE bought SET card_id = ? WHERE username = ? AND card_id = ?";
     private final String SELECT_TRADE_DETAILS_SQL = "SELECT card_id, sellerUsername FROM trade WHERE trade_id = ?";
     private final String SELECT_USER_TRADES = "SELECT * FROM trade";
@@ -30,6 +31,25 @@ public class TradingRepository {
 
     public TradingRepository() {
         this.packageService = new PackageService();
+    }
+
+    public String selectSellerUsername(String tradeId) {
+        try (
+          Connection con = database.getConnection();
+          PreparedStatement selectSellerUsername = con.prepareStatement(SELECT_SELLERUSER);
+        ) {
+            selectSellerUsername.setString(1, tradeId);
+            try (ResultSet tradeResult = selectSellerUsername.executeQuery()) {
+                if (tradeResult.next()) {
+                    return tradeResult.getString("sellerusername");
+                } else {
+                    // Wenn keine Zeile gefunden wurde, könnte hier eine geeignete Behandlung erfolgen
+                    return null; // Oder eine andere Standard-Rückgabewert
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error trading cards", e);
+        }
     }
 
     public void tradeCards(String tradeId, String buyerUsername, String card_id_buyer) {
@@ -66,12 +86,12 @@ public class TradingRepository {
         }
     }
 
-    public List<String> getCards() {
+    public List<String> getCards(String username) {
         try (
                 Connection con = database.getConnection();
                 PreparedStatement pstmt = con.prepareStatement(SELECT_USER_CARDS);
         ) {
-
+            pstmt.setString(1, username);
             List<String> userCards = new ArrayList<>();
 
             try (ResultSet rs = pstmt.executeQuery()) {

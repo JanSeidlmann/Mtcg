@@ -15,9 +15,9 @@ public class CardService {
     private final CardRepository cardRepository;
     private final PackageService packageService;
 
-    public CardService() {
-        this.cardRepository = new CardRepository();
-        this.packageService = new PackageService();
+    public CardService(CardRepository cardRepository, PackageService packageService) {
+        this.cardRepository = cardRepository;
+        this.packageService = packageService;
     }
 
     public Response getCards(Request request) {

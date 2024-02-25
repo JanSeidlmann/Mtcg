@@ -1,6 +1,5 @@
 package at.technikum.apps.mtcg.controller;
 
-import at.technikum.apps.mtcg.repository.BattleRepository;
 import at.technikum.apps.mtcg.service.BattleService;
 import at.technikum.apps.mtcg.service.PackageService;
 import at.technikum.server.http.HttpContentType;

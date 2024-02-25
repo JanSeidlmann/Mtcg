@@ -12,9 +12,21 @@ public class Card {
             return "Water";
         } else if (this.Name.contains("Fire")) {
             return "Fire";
-        } else {
+        } else if (this.Name.contains("Regular")){
             return "Regular";
+        } else {
+            return "Unknown";
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Card{" +
+          "Id='" + Id + '\'' +
+          ", Name='" + Name + '\'' +
+          ", Damage=" + Damage +
+          ", type='" + type + '\'' +
+          '}';
     }
 
     public String getType() {

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class DatabaseRepository implements Repository {
+public class UserRepository implements Repository {
     private final String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
     private final String UPDATE_USER_BY_USERNAME = "UPDATE users SET password = ?, username = ? WHERE username = ?";
     private final String SAVE_SQL = "INSERT INTO users(id, Username, Password, coins) VALUES(?, ?, ?, ?)";

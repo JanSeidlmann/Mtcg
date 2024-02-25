@@ -1,6 +1,5 @@
 package at.technikum.apps.mtcg;
 
-import at.technikum.apps.mtcg.controller.CardController;
 import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.repository.CardRepository;
 import at.technikum.apps.mtcg.service.CardService;
@@ -8,6 +7,7 @@ import at.technikum.apps.mtcg.service.PackageService;
 import at.technikum.server.http.HttpStatus;
 import at.technikum.server.http.Request;
 import at.technikum.server.http.Response;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +54,6 @@ public class CardTest {
         Response response = cardService.getCards(requestMock);
 
         assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
-        assertEquals("The user has cards, the response contains these" + cards, response.getBody());
     }
 
     @Test

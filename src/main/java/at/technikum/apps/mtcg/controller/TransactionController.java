@@ -48,7 +48,7 @@ public class TransactionController implements Controller {
 
             String username = packageService.extractUsernameFromToken(request.getToken());
 
-            if (transactionRepository.enoughCoins(username)){
+            if (!transactionRepository.enoughCoins(username)){
                 Response response = new Response();
                 response.setStatus(HttpStatus.OK);
                 response.setContentType(HttpContentType.APPLICATION_JSON);

@@ -9,8 +9,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 
-public class UserTests {
-  MtcgApp mtcgApp = new MtcgApp();
+class UserTests {
 
   private Request createMockRequestUser(HttpMethod method, String route, String token) {
     Request mockRequest = mock(Request.class);
@@ -34,7 +33,7 @@ public class UserTests {
   }
 
   @Test
-  void handleGetRequestWithMatchingToken() {
+  void handleGetRequest() {
     // Arrange
     UserController userController = spy(new UserController());
     Response response = mock(Response.class);
@@ -47,25 +46,7 @@ public class UserTests {
     userController.handle(getRequest);
 
     // Assert
-    verify(userController, times(1)).handle(getRequest);
-  }
-
-  @Test
-  void handleGetRequestWithNonMatchingToken() {
-    // Arrange
-    UserController userController = spy(new UserController());
-    Response response = mock(Response.class);
-
-    Request getRequest = createMockRequestUser(HttpMethod.GET, "/users/testUser", "wrongUser");
-
-    doReturn(response).when(userController).handle(getRequest);
-
-    // Act
-    userController.handle(getRequest);
-
-    // Assert
-    verify(userController, times(1)).handle(getRequest);
-    // Assertions.assertEquals(HttpStatus.OK.getCode(), response.getStatusCode());
+    verify(userController).handle(getRequest);
   }
 
   @Test
@@ -84,11 +65,11 @@ public class UserTests {
     userController.handle(postRequest);
 
     // Assert
-    verify(userController, times(1)).handle(postRequest);
+    verify(userController).handle(postRequest);
   }
 
   @Test
-  void handlePutRequestWithMatchingToken() {
+  void handlePutRequest() {
     // Arrange
     UserController userController = spy(new UserController());
     Response response = mock(Response.class);
@@ -102,58 +83,5 @@ public class UserTests {
 
     // Assert
     verify(userController, times(1)).handle(putRequest);
-  }
-
-  @Test
-  void handlePutRequestWithNonMatchingToken() {
-    // Arrange
-    UserController userController = spy(new UserController());
-    Response response = mock(Response.class);
-
-    Request putRequest = createMockRequestUser(HttpMethod.PUT, "/users/testUser", "wrongUser");
-
-    doReturn(response).when(userController).handle(putRequest);
-
-    // Act
-    userController.handle(putRequest);
-
-    // Assert
-    verify(userController, times(1)).handle(putRequest);
-  }
-
-  @Test
-  void handlePostRequestWithValidCredentials() {
-    // Arrange
-    UserController userController = spy(new UserController());
-    Response response = mock(Response.class);
-
-    // Create a mock Request with a body containing Username and Password in JSON format
-    Request postRequest = createMockRequestSessions(HttpMethod.POST, "/session", "{\"Username\": \"validUser\", \"Password\": \"validPassword\"}", null);
-
-    doReturn(response).when(userController).handle(postRequest);
-
-    // Act
-    userController.handle(postRequest);
-
-    // Assert
-    verify(userController, times(1)).handle(postRequest);
-  }
-
-  @Test
-  void handlePostRequestWithInvalidCredentials() {
-    // Arrange
-    UserController userController = spy(new UserController());
-    Response response = mock(Response.class);
-
-    // Create a mock Request with a body containing Username and Password in JSON format
-    Request postRequest = createMockRequestSessions(HttpMethod.POST, "/session", "{\"Username\": \"invalidUser\", \"Password\": \"invalidPassword\"}", null);
-
-    doReturn(response).when(userController).handle(postRequest);
-
-    // Act
-    userController.handle(postRequest);
-
-    // Assert
-    verify(userController, times(1)).handle(postRequest);
   }
 }

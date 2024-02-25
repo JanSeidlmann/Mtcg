@@ -2,7 +2,7 @@ package at.technikum.apps.mtcg.service;
 
 import at.technikum.apps.mtcg.Exception.DuplicateUserException;
 import at.technikum.apps.mtcg.entity.User;
-import at.technikum.apps.mtcg.repository.DatabaseRepository;
+import at.technikum.apps.mtcg.repository.UserRepository;
 import at.technikum.apps.mtcg.repository.Repository;
 import at.technikum.server.http.Request;
 
@@ -12,12 +12,11 @@ import java.util.UUID;
 public class UserService {
 
     private final Repository repository;
-    private final PackageService packageService;
 
     public UserService() {
-        this.repository = new DatabaseRepository();
-        this.packageService = new PackageService();
+        this.repository = new UserRepository();
     }
+    public UserService(Repository repository) {this.repository = repository;}
 
     public Optional<User> findUserByUsername(String username) {
         return repository.findUserByUsername(username);
@@ -47,6 +46,7 @@ public class UserService {
         if (findUserByUsername(user.getUsername()).isPresent()) {
             throw new DuplicateUserException(user.getUsername());
         }
+        // userRepo aufrufen und stats alles auf 0 setzen außer username und elo auf 100
 
         user.setId(UUID.randomUUID().toString());
         return repository.saveUser(user);

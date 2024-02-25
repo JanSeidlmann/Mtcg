@@ -83,20 +83,38 @@ public class DeckService {
 
             deckRepository.configureDeck(username, cardIds);
 
-            if (request.getContentType().equals("application/json")){
                 Response response = new Response();
                 response.setStatus(HttpStatus.OK);
                 response.setContentType(HttpContentType.APPLICATION_JSON);
                 response.setBody("The deck has been successfully configured");
                 return response;
-            }
-            else {
-                Response response = new Response();
-                response.setStatus(HttpStatus.OK);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error processing JSON", e);
+        }
+    }
+
+    public Response getDeckPlain(Request request) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String token = request.getToken();
+            String username = packageService.extractUsernameFromToken(token);
+
+            List<Card> deck = deckRepository.getDeck(username);
+
+            String deckJson = objectMapper.writeValueAsString(deck);
+
+          Response response = new Response();
+
+          if(!deck.isEmpty()) {
+            response.setStatus(HttpStatus.OK);
                 response.setContentType(HttpContentType.TEXT_PLAIN);
-                response.setBody("The deck has been successfully configured");
-                return response;
-            }
+                response.setBody("The deck has cards, the response contains these" + deckJson);
+          } else {
+            response.setStatus(HttpStatus.NO_CONTENT);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody("The request was fine, but the deck doesn't have any cards");
+          }
+          return response;
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error processing JSON", e);
         }

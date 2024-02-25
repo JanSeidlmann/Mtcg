@@ -22,7 +22,7 @@ public class TransactionRepository {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     int coins = rs.getInt("coins");
-                    return coins < 5;
+                    return coins >= 5;
                 }
                 pstmt.executeUpdate();
             } catch (SQLException e) {
@@ -31,7 +31,7 @@ public class TransactionRepository {
         } catch (SQLException e){
             throw new RuntimeException("Error checking coins", e);
         }
-        return true;
+        return false;
     }
 
     public void deductCoins(String username){
@@ -39,7 +39,7 @@ public class TransactionRepository {
             Connection con = database.getConnection();
             PreparedStatement pstmt = con.prepareStatement(DEDUCT_COINS);
         ) {
-            if (enoughCoins(username)){
+            if (!enoughCoins(username)){
                 throw new RuntimeException("Not enough coins!");
             }
 
@@ -99,7 +99,7 @@ public class TransactionRepository {
                 Connection con = database.getConnection();
         ) {
             System.out.println("Checking if the user has enough coins!");
-            if (enoughCoins(username))
+            if (!enoughCoins(username))
                 throw new RuntimeException("Not enough coins!");
 
             System.out.println("Select and insert cards!");

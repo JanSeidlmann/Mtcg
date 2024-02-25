@@ -1,5 +1,7 @@
 package at.technikum.server.http;
 
+import java.util.Objects;
+
 public class Response {
 
     private int statusCode;
@@ -9,6 +11,23 @@ public class Response {
     private String contentType;
 
     private String body;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Response response = (Response) o;
+        return statusCode == response.statusCode && Objects.equals(statusMessage, response.statusMessage) && Objects.equals(contentType, response.contentType) && Objects.equals(body, response.body);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(statusCode, statusMessage, contentType, body);
+    }
 
     public void setStatus(HttpStatus httpStatus) {
         this.statusCode = httpStatus.getCode();

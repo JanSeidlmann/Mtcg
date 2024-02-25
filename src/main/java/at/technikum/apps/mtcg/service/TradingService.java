@@ -1,6 +1,8 @@
 package at.technikum.apps.mtcg.service;
 
+import at.technikum.apps.mtcg.entity.Card;
 import at.technikum.apps.mtcg.entity.Trade;
+import at.technikum.apps.mtcg.repository.DeckRepository;
 import at.technikum.apps.mtcg.repository.TradingRepository;
 import at.technikum.server.http.HttpContentType;
 import at.technikum.server.http.HttpStatus;
@@ -10,26 +12,34 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Arrays;
 import java.util.List;
-
+import java.util.UUID;
 
 public class TradingService {
 
     private final TradingRepository tradingRepository;
     private final PackageService packageService;
+    private final DeckRepository deckRepository;
 
     public TradingService() {
         this.tradingRepository = new TradingRepository();
         this.packageService = new PackageService();
+        this.deckRepository = new DeckRepository();
     }
 
     public void tradeCards(String tradeId, String buyerUsername, Request request) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            JsonNode rootNode = objectMapper.readTree(request.getBody());
-            JsonNode cardIdsNode = rootNode.get("card_id");
+            JsonNode traderCardId = objectMapper.readTree(request.getBody());
 
-            tradingRepository.tradeCards(tradeId, buyerUsername, cardIdsNode.asText());
+            List<Card> ownCardId = deckRepository.getDeck(buyerUsername);
+
+            if(ownCardId.toString().contains(traderCardId.toString())) {
+                return;
+            }
+
+            tradingRepository.tradeCards(tradeId, buyerUsername, traderCardId.asText());
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error processing JSON", e);
@@ -50,7 +60,7 @@ public class TradingService {
     }
 
 
-    public Response createTrade(Request request) { // void machen und Responses in Controller
+    public Response createTrade(Request request) {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
@@ -61,34 +71,40 @@ public class TradingService {
                 response.setStatus(HttpStatus.UNAUTHORIZED);
                 response.setContentType(HttpContentType.APPLICATION_JSON);
                 response.setBody("Access token is missing or invalid");
+                return response;
             }
 
             String username = packageService.extractUsernameFromToken(token);
-            Trade trade = objectMapper.readValue(request.getBody(), Trade.class);
-            String card_id = trade.getCard_id();
+            JsonNode trade = objectMapper.readTree(request.getBody());
+            String tradeId = trade.get("Id").asText();
+            String cardId = trade.get("CardToTrade").asText();
+            String type = trade.get("Type").asText();
+            int damage = trade.get("MinimumDamage").asInt();
 
-            List<String> userCards = tradingRepository.getCards();
-            boolean cardBelongsToUser = userCards.contains(card_id);
+            List<Card> ownCardId = deckRepository.getDeck(username);
+
+            if(ownCardId.toString().contains(cardId)) {
+                Response response = new Response();
+                response.setStatus(HttpStatus.FORBIDDEN);
+                response.setContentType(HttpContentType.APPLICATION_JSON);
+                response.setBody("The specified card is already in the user's deck");
+                return response;
+            }
+
+            List<String> userCards = tradingRepository.getCards(username);
+            boolean cardBelongsToUser = userCards.contains(cardId);
             List<String> userDeck = tradingRepository.getDeck(username);
-            boolean cardInUserDeck = userDeck.contains(card_id);
+            boolean cardInUserDeck = userDeck.contains(cardId);
 
             if (!cardBelongsToUser || cardInUserDeck) {
                 Response response = new Response();
                 response.setStatus(HttpStatus.FORBIDDEN);
                 response.setContentType(HttpContentType.APPLICATION_JSON);
                 response.setBody("The deal contains a card that is not owned by the user or locked in the deck");
+                return response;
             }
 
-            List<Trade> tradeList = tradingRepository.getTrades();
-
-//            if (tradeList.getFirst().getTrade_id().equals(trade.getTrade_id())){
-//                Response response = new Response();
-//                response.setStatus(HttpStatus.UNAUTHORIZED);
-//                response.setContentType(HttpContentType.APPLICATION_JSON);
-//                response.setBody("A deal with this deal ID already exists.");
-//            }
-
-            tradingRepository.createTrade(request, trade.getTrade_id(), trade.getCard_id(), trade.getType(), trade.getDamage());
+            tradingRepository.createTrade(request, tradeId, cardId, type, damage);
 
             Response response = new Response();
             response.setStatus(HttpStatus.CREATED);

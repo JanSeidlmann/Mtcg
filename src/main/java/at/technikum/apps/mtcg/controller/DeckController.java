@@ -15,7 +15,7 @@ public class DeckController implements Controller {
 
     @Override
     public boolean supports(String route) {
-        return route.equals("/deck");
+        return route.startsWith("/deck");
     }
 
     @Override
@@ -37,6 +37,10 @@ public class DeckController implements Controller {
                 case "PUT":
                     return configureDeck(request);
             }
+        } else {
+            if(request.getRoute().equals("/deck?format=plain")){
+                return getDeckPlain(request);
+            }
         }
         return status(HttpStatus.BAD_REQUEST);
     }
@@ -44,6 +48,15 @@ public class DeckController implements Controller {
     public Response getDeck(Request request) {
         try {
             return deckService.getDeck(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return createErrorResponse("Error getting user deck");
+        }
+    }
+
+    public Response getDeckPlain(Request request) {
+        try {
+            return deckService.getDeckPlain(request);
         } catch (Exception e) {
             e.printStackTrace();
             return createErrorResponse("Error getting user deck");

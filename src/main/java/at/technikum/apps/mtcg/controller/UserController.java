@@ -144,9 +144,19 @@ public class UserController implements Controller {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-      Optional<User> existingUserOptional = userService.findUserByUsername(username);
+        Optional<User> existingUserOptional = userService.findUserByUsername(username);
+        String token = request.getToken();
+        String tokenUsername = packageService.extractUsernameFromToken(token);
 
-      if (existingUserOptional.isPresent()) {
+        if(!username.equals(tokenUsername)) {
+            Response response = new Response();
+            response.setStatus(HttpStatus.UNAUTHORIZED);
+            response.setContentType(HttpContentType.APPLICATION_JSON);
+            response.setBody("Access token is missing or invalid");
+
+            return response;
+        }
+        if (existingUserOptional.isPresent()) {
           User existingUser = existingUserOptional.get();
           existingUser.setUsername(updatedUser.getUsername());
           existingUser.setPassword(updatedUser.getPassword());
@@ -158,9 +168,9 @@ public class UserController implements Controller {
           response.setBody("User successfully updated");
 
           return response;
-      } else {
+        } else {
           return status(HttpStatus.BAD_REQUEST);
-      }
+        }
     }
 
     public Response loginUser(Request request) {

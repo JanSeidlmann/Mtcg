@@ -1,0 +1,22 @@
+Protokoll
+
+Das Projekt Mtcg hat mir geholfen mein können auszubauen und dadurch habe ich auch viel Neues dazugelernt.
+
+Design:
+Ich habe leider ein bisschen zuspät begonnen und deswegen auch die Planung vernachlässig. Ich benutze eine
+persistente Postgres-Datenbank welche in einem Dockercontainer läuft. An sich ist das Projekt so aufgebaut,
+dass im Controller nur der Service aufgerufen wird und die Responses beinhält. Im Service ist das der größte
+Teil der Logik und hier wird wiederum das Repository aufgerufen. Das Repository übernimmt die Aufgabe mit der
+Datenbank zu kommunizieren.
+
+Tests:
+Hier bin ich draufgekommen das mir das Testen noch nicht so ganz liegt, weswegen mir es schwer gefallen ist einige
+Tests gut hinzubekommen. Im Endeffekt ist es mit viel Zeitaufwand dann doch gegangen und ich konnte einiges an Code
+abdecken. Ich teste eben die einzelnen Units und mocke die Teile die für den Test nicht relevant sind. Hier wäre es
+auch von Vorteil gewesen sich im Vorhinein zu überlegen wie man was dann testen muss/könnte.
+
+Zeitaufwand:
+Ich habe an dem Projekt insgesamt ungefähr 100 Stunden gearbeitet,
+
+Github:
+https://github.com/JanSeidlmann/Mtcg

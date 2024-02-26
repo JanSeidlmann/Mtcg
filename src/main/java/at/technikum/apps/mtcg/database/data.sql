@@ -2,7 +2,9 @@ CREATE TABLE IF NOT EXISTS users (
                        id VARCHAR(255) PRIMARY KEY,
                        Username VARCHAR(255) UNIQUE NOT NULL,
                        Password VARCHAR(255) NOT NULL,
-                       coins INTEGER
+                       coins INTEGER,
+                       Bio VARCHAR(255),
+                       Image VARCHAR(255)
 
 );
 

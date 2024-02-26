@@ -83,7 +83,7 @@ paths:
         required: true
       responses:
         '200':
-          description: User sucessfully updated.
+          description: User sucessfully updated
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':

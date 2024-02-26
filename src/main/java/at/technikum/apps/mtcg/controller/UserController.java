@@ -144,28 +144,23 @@ public class UserController implements Controller {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        try {
-            Optional<User> existingUserOptional = userService.findUserByUsername(username);
+      Optional<User> existingUserOptional = userService.findUserByUsername(username);
 
-            if (existingUserOptional.isPresent()) {
-                User existingUser = existingUserOptional.get();
-                existingUser.setUsername(updatedUser.getUsername());
-                existingUser.setPassword(updatedUser.getPassword());
-                userService.updateUserByUsername(username, request);
-                String updatedUserJson = objectMapper.writeValueAsString(existingUser);
+      if (existingUserOptional.isPresent()) {
+          User existingUser = existingUserOptional.get();
+          existingUser.setUsername(updatedUser.getUsername());
+          existingUser.setPassword(updatedUser.getPassword());
+          userService.updateUserByUsername(username, request);
 
-                Response response = new Response();
-                response.setStatus(HttpStatus.OK);
-                response.setContentType(HttpContentType.APPLICATION_JSON);
-                response.setBody(updatedUserJson);
+          Response response = new Response();
+          response.setStatus(HttpStatus.OK);
+          response.setContentType(HttpContentType.APPLICATION_JSON);
+          response.setBody("User successfully updated");
 
-                return response;
-            } else {
-                return status(HttpStatus.BAD_REQUEST);
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+          return response;
+      } else {
+          return status(HttpStatus.BAD_REQUEST);
+      }
     }
 
     public Response loginUser(Request request) {

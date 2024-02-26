@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public class UserRepository implements Repository {
     private final String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
-    private final String UPDATE_USER_BY_USERNAME = "UPDATE users SET password = ?, username = ? WHERE username = ?";
+    private final String UPDATE_USER_BY_USERNAME = "UPDATE users SET username = ?, Bio = ?, Image = ? WHERE username = ?";
     private final String SAVE_SQL = "INSERT INTO users(id, Username, Password, coins) VALUES(?, ?, ?, ?)";
     private final Database database = new Database();
 
@@ -33,7 +33,7 @@ public class UserRepository implements Repository {
             pstmt.setInt(4, 20);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace(); // THOUGHT: how do i handle exceptions (hint: look at the TaskApp)
+            e.printStackTrace();
         }
 
         return user;
@@ -79,12 +79,14 @@ public class UserRepository implements Repository {
                 Connection con = database.getConnection();
                 PreparedStatement preparedStatement = con.prepareStatement(UPDATE_USER_BY_USERNAME)
         ) {
-            String newPassword = objectMapper.readTree(request.getBody()).get("password").asText();
-            String newUsername = objectMapper.readTree(request.getBody()).get("username").asText();
+            String newUsername = objectMapper.readTree(request.getBody()).get("Username").asText();
+            String newBio = objectMapper.readTree(request.getBody()).get("Bio").asText();
+            String newImage = objectMapper.readTree(request.getBody()).get("Image").asText();
 
-            preparedStatement.setString(1, newPassword);
-            preparedStatement.setString(2, newUsername);
-            preparedStatement.setString(3, username);
+            preparedStatement.setString(1, newUsername);
+            preparedStatement.setString(2, newBio);
+            preparedStatement.setString(3, newImage);
+            preparedStatement.setString(4, username);
 
             int rowsUpdated = preparedStatement.executeUpdate();
 

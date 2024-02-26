@@ -103,26 +103,26 @@ public class BattleService {
 
     private BattleOutcome calculateRoundResult(Card card1, Card card2) {
         // Autowins because of special ability
-        if(player1Card.getName().contains("Goblin") && player2Card.getName().contains("Dragon")) {
-            return Result.Player2_Win;
-        } else if(player1Card.getName().contains("Dragon") && player2Card.getName().contains("Goblin")) {
-            return Result.Player1_Win;
-        } else if(player1Card.getName().contains("Wizard") && player2Card.getName().contains("Ork")) {
-            return Result.Player1_Win;
-        } else if(player1Card.getName().contains("Ork") && player2Card.getName().contains("Wizard")) {
-            return Result.Player2_Win;
-        } else if(player1Card.getName().contains("Knights") && player2Card.getName().contains("Water")) {
-            return Result.Player2_Win;
-        } else if(player1Card.getName().contains("Water") && player2Card.getName().contains("Knights")) {
-            return Result.Player1_Win;
-        } else if(player1Card.getName().contains("Kraken") && player2Card.getName().contains("Spell")) {
-            return Result.Player1_Win;
-        } else if (player1Card.getName().contains("Spell") && player2Card.getName().contains("Kraken")) {
-            return Result.Player2_Win;
-        } else if (player1Card.getName().contains("FireElf") && player2Card.getName().contains("Dragon")) {
-            return Result.Player1_Win;
-        } else if (player1Card.getName().contains("Dragon") && player2Card.getName().contains("FireElf")) {
-            return Result.Player2_Win;
+        if(card1.getName().contains("Goblin") && card2.getName().contains("Dragon")) {
+            return BattleOutcome.PLAYER2_WIN;
+        } else if(card1.getName().contains("Dragon") && card2.getName().contains("Goblin")) {
+            return BattleOutcome.PLAYER1_WIN;
+        } else if(card1.getName().contains("Wizard") && card2.getName().contains("Ork")) {
+            return BattleOutcome.PLAYER1_WIN;
+        } else if(card1.getName().contains("Ork") && card2.getName().contains("Wizard")) {
+            return BattleOutcome.PLAYER2_WIN;
+        } else if(card1.getName().contains("Knights") && card2.getName().contains("Water")) {
+            return BattleOutcome.PLAYER2_WIN;
+        } else if(card1.getName().contains("Water") && card2.getName().contains("Knights")) {
+            return BattleOutcome.PLAYER1_WIN;
+        } else if(card1.getName().contains("Kraken") && card2.getName().contains("Spell")) {
+            return BattleOutcome.PLAYER1_WIN;
+        } else if (card1.getName().contains("Spell") && card2.getName().contains("Kraken")) {
+            return BattleOutcome.PLAYER2_WIN;
+        } else if (card1.getName().contains("FireElf") && card2.getName().contains("Dragon")) {
+            return BattleOutcome.PLAYER1_WIN;
+        } else if (card1.getName().contains("Dragon") && card2.getName().contains("FireElf")) {
+            return BattleOutcome.PLAYER2_WIN;
         }
         if (isMonster(card1) && isMonster(card2)) {
             return calculateMonsterRoundResult(card1, card2);

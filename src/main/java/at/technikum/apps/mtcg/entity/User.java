@@ -13,6 +13,10 @@ public class User {
 
     public int coins;
 
+    public String Bio;
+
+    public String Image;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -58,5 +62,21 @@ public class User {
 
     public void setCoins(int coins) {
         this.coins = coins;
+    }
+
+    public String getBio() {
+        return Bio;
+    }
+
+    public void setBio(String bio) {
+        Bio = bio;
+    }
+
+    public String getImage() {
+        return Image;
+    }
+
+    public void setImage(String image) {
+        Image = image;
     }
 }

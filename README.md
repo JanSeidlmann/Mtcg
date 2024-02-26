@@ -21,7 +21,7 @@ Um das Projekt zu verwenden, müssen Sie Java und eine geeignete Entwicklungsumg
 1. Klonen Sie das Repository auf Ihren lokalen Computer.
 2. Öffnen Sie das Projekt in Ihrer IDE.
 3. Konfigurieren Sie die Datenbankverbindung.
-4. Führen Sie die Anwendung.
+4. Führen Sie die Anwendung aus.
 
 ## Entwickler
 

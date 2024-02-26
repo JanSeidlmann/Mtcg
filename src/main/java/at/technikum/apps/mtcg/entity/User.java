@@ -13,6 +13,8 @@ public class User {
 
     public int coins;
 
+    public String Name;
+
     public String Bio;
 
     public String Image;
@@ -78,5 +80,13 @@ public class User {
 
     public void setImage(String image) {
         Image = image;
+    }
+
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        Name = name;
     }
 }

@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public class UserRepository implements Repository {
     private final String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
-    private final String UPDATE_USER_BY_USERNAME = "UPDATE users SET username = ?, Bio = ?, Image = ? WHERE username = ?";
+    private final String UPDATE_USER_BY_USERNAME = "UPDATE users SET Name = ?, Bio = ?, Image = ? WHERE username = ?";
     private final String SAVE_SQL = "INSERT INTO users(id, Username, Password, coins) VALUES(?, ?, ?, ?)";
     private final String SETUP_STATS = "INSERT INTO stats(username, totalgames, gameswon, gameslost, elo) VALUES(?,?,?,?,?)";
     private final Database database = new Database();
@@ -80,11 +80,11 @@ public class UserRepository implements Repository {
                 Connection con = database.getConnection();
                 PreparedStatement preparedStatement = con.prepareStatement(UPDATE_USER_BY_USERNAME)
         ) {
-            String newUsername = objectMapper.readTree(request.getBody()).get("Username").asText();
+            String name = objectMapper.readTree(request.getBody()).get("Name").asText();
             String newBio = objectMapper.readTree(request.getBody()).get("Bio").asText();
             String newImage = objectMapper.readTree(request.getBody()).get("Image").asText();
 
-            preparedStatement.setString(1, newUsername);
+            preparedStatement.setString(1, name);
             preparedStatement.setString(2, newBio);
             preparedStatement.setString(3, newImage);
             preparedStatement.setString(4, username);
@@ -93,7 +93,7 @@ public class UserRepository implements Repository {
 
             if (rowsUpdated > 0) {
                 // If the update was successful, retrieve the updated user
-                return findUserByUsername(newUsername);
+                return findUserByUsername(username);
             }
         } catch (SQLException | JsonProcessingException e) {
             e.printStackTrace();

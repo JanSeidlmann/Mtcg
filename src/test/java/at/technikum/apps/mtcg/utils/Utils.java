@@ -12,7 +12,13 @@ public class Utils {
     try (Connection connection = database.getConnection();
          Statement statement = connection.createStatement()) {
 
-      String deleteCardsQuery = "DELETE FROM users";
+      String deleteCardsQuery = "DELETE FROM users;" +
+        "DELETE FROM packages;" +
+        "DELETE FROM cards;" +
+        "DELETE FROM bought;" +
+        "DELETE FROM deck;" +
+        "DELETE FROM stats;" +
+        "DELETE FROM trade;";
       statement.executeUpdate(deleteCardsQuery);
 
     } catch (SQLException e) {

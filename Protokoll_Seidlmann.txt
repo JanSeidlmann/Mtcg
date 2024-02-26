@@ -16,7 +16,12 @@ abdecken. Ich teste eben die einzelnen Units und mocke die Teile die für den Te
 auch von Vorteil gewesen sich im Vorhinein zu überlegen wie man was dann testen muss/könnte.
 
 Zeitaufwand:
-Ich habe an dem Projekt insgesamt ungefähr 100 Stunden gearbeitet,
+Ich habe an dem Projekt insgesamt ungefähr 100 Stunden gearbeitet.
+
+Feature:
+Als Feature habe ich eingebaut das der Gewinner eines Battles einen Rewards bekommt, und zwar ist der Preis für den
+Sieg ein coin. Sie kann man sich auch neue Karten mit der Zeit holen ohne auf andere Spieler angewiesen sein zu
+müssen (Trading).
 
 Github:
 https://github.com/JanSeidlmann/Mtcg

@@ -19,6 +19,7 @@ public class UserRepository implements Repository {
     private final String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
     private final String UPDATE_USER_BY_USERNAME = "UPDATE users SET username = ?, Bio = ?, Image = ? WHERE username = ?";
     private final String SAVE_SQL = "INSERT INTO users(id, Username, Password, coins) VALUES(?, ?, ?, ?)";
+    private final String SETUP_STATS = "INSERT INTO stats(username, totalgames, gameswon, gameslost, elo) VALUES(?,?,?,?,?)";
     private final Database database = new Database();
 
     @Override
@@ -101,6 +102,23 @@ public class UserRepository implements Repository {
         return Optional.empty();
     }
 
+    @Override
+    public void setUpStats(User user){
+        try (
+          Connection con = database.getConnection();
+          PreparedStatement preparedStatement = con.prepareStatement(SETUP_STATS)
+        ) {
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setInt(2, 0);
+            preparedStatement.setInt(3, 0);
+            preparedStatement.setInt(4, 0);
+            preparedStatement.setInt(5, 100);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public List<Card> findAllCards() {

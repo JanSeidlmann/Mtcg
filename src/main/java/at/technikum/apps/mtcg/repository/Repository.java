@@ -25,4 +25,6 @@ public interface Repository {
     Optional<User> findUserByUsername(String username);
 
     Optional<User> updateUserByUsername(String username, Request request);
+
+  void setUpStats(User user);
 }

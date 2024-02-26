@@ -84,11 +84,11 @@ public class BattleService {
     private String getWinner(String player1, String player2, BattleOutcome result) {
         switch (result) {
             case PLAYER1_WIN:
-                return player1 + " wins";
+                return player1 + " wins\n";
             case PLAYER2_WIN:
-                return player2 + " wins";
+                return player2 + " wins\n";
             default:
-                return "It's a draw";
+                return "It's a draw\n";
         }
     }
 

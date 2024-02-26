@@ -6,6 +6,7 @@ import at.technikum.server.http.HttpContentType;
 import at.technikum.server.http.HttpStatus;
 import at.technikum.server.http.Request;
 import at.technikum.server.http.Response;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class StatsController implements Controller {
   private final StatsService statsService;
@@ -40,14 +41,16 @@ public class StatsController implements Controller {
   }
 
   private Response getStats(Request request) {
+    ObjectMapper objectMapper = new ObjectMapper();
     try {
       String username = packageService.extractUsernameFromToken(request.getToken());
       Stats stats = statsService.getStats(username);
+      String statsJson = objectMapper.writeValueAsString(stats);
 
       Response response = new Response();
       response.setStatus(HttpStatus.OK);
       response.setContentType(HttpContentType.APPLICATION_JSON);
-      response.setBody(stats.toString());
+      response.setBody(statsJson);
       return response;
     } catch (Exception e){
       Response response = new Response();

@@ -31,7 +31,6 @@ public class UserService {
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            // Check if the provided password matches the stored password
             if (password.equals(user.getPassword())) {
                 return Optional.of(user);
             }
@@ -46,8 +45,7 @@ public class UserService {
         if (findUserByUsername(user.getUsername()).isPresent()) {
             throw new DuplicateUserException(user.getUsername());
         }
-        // userRepo aufrufen und stats alles auf 0 setzen außer username und elo auf 100
-
+        repository.setUpStats(user);
         user.setId(UUID.randomUUID().toString());
         return repository.saveUser(user);
     }

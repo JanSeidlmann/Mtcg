@@ -65,6 +65,10 @@ public class PackageRepository implements Repository {
     }
 
     @Override
+    public void setUpStats(User user) {
+    }
+
+    @Override
     public Optional<User> findUser(UUID id) {
         return Optional.empty();
     }

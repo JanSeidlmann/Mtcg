@@ -9,6 +9,10 @@ import java.sql.ResultSet;
 
 public class StatsRepository {
   private final String GET_STATS = "SELECT username, totalGames, gamesWon, gamesLost, elo FROM stats WHERE username = ?";
+  private final String UPDATE_STATS_DRAW = "UPDATE stats SET totalGames = totalGames + 1 WHERE username IN (?, ?)";
+  private final String UPDATE_STATS_WIN = "UPDATE stats SET totalGames = totalGames + 1, gamesWon = gamesWon + 1, elo = elo + 3 WHERE username = ?; " +
+          "UPDATE stats SET totalGames = totalGames + 1, gamesLost = gamesLost + 1, elo = elo - 5 WHERE username = ?;";
+
   Database database = new Database();
   public Stats getStats(String username) {
     try (Connection connection = database.getConnection()) {
@@ -39,14 +43,16 @@ public class StatsRepository {
     String query, winner = player1, loser = player2;
 
     if (result == BattleService.BattleOutcome.DRAW) {
-      query = "UPDATE stats SET totalGames = totalGames + 1 WHERE username IN (?, ?)";
+      query = UPDATE_STATS_DRAW;
     } else {
       if (result == BattleService.BattleOutcome.PLAYER2_WIN) {
         winner = player2;
         loser = player1;
+      } else {
+        winner = player1;
+        loser = player2;
       }
-      query = "UPDATE stats SET totalGames = totalGames + 1, gamesWon = gamesWon + 1, elo = elo + 3 WHERE username = ?; " +
-        "UPDATE stats SET totalGames = totalGames + 1, gamesLost = gamesLost + 1, elo = elo - 5 WHERE username = ?;";
+      query = UPDATE_STATS_WIN;
     }
 
     try (Connection connection = database.getConnection()) {
